@@ -2,7 +2,10 @@
  * Fast heuristic-based Solana project detector.
  *
  * This is the first-pass filter that runs BEFORE sending repos
- * to Gemini for deep analysis. It's designed to be fast and cheap.
+ * to Gemini for deep analysis. Designed to be fast and cheap.
+ *
+ * File checks are only done for repos that already have keyword/topic signals,
+ * and are run with concurrency limits.
  */
 
 import {
@@ -18,6 +21,9 @@ export interface HeuristicResult {
   confidence: number; // 0-100
   signals: string[];
 }
+
+/** Max concurrent file checks to avoid hammering GitHub */
+const MAX_FILE_CHECK_CONCURRENCY = 5;
 
 /**
  * Run heuristic analysis on a repository.
@@ -38,7 +44,7 @@ export async function analyzeWithHeuristics(
     signals.push(`Topics: ${matchedTopics.join(", ")}`);
   }
 
-  // 2. Check description for keywords
+  // 2. Check description and name for keywords
   const desc = (repo.description ?? "").toLowerCase();
   const nameCheck = repo.name.toLowerCase();
   const matchedKeywords = SOLANA_KEYWORDS.filter(
@@ -46,37 +52,36 @@ export async function analyzeWithHeuristics(
   );
   if (matchedKeywords.length > 0) {
     score += 30;
-    signals.push(`Keywords in name/desc: ${matchedKeywords.join(", ")}`);
+    signals.push(`Keywords in name/desc: ${matchedKeywords.slice(0, 3).join(", ")}`);
   }
 
-  // 3. Check for Solana-specific files (Anchor.toml, etc.)
-  if (score >= 20) {
-    // Only do file checks if we already have some signal (saves API calls)
-    for (const fileIndicator of SOLANA_FILE_INDICATORS) {
-      const content = await fetchFileContent(
-        repo.owner.login,
-        repo.name,
-        fileIndicator,
-        repo.defaultBranch
-      );
-      if (content !== null) {
-        score += 30;
-        signals.push(`File found: ${fileIndicator}`);
-        break; // One file is enough
+  // 3. Check for Solana-specific files — ONLY if we have some signal already
+  if (score >= 30) {
+    try {
+      for (const fileIndicator of SOLANA_FILE_INDICATORS) {
+        const content = await fetchFileContent(
+          repo.owner.login,
+          repo.name,
+          fileIndicator,
+          repo.defaultBranch
+        );
+        if (content !== null) {
+          score += 30;
+          signals.push(`File found: ${fileIndicator}`);
+          break;
+        }
       }
+    } catch {
+      // File check failed — no big deal, we already have keyword signals
     }
   }
 
-  // 4. Check if Rust/TypeScript (common Solana languages) — weak signal
-  if (repo.language === "Rust" || repo.language === "TypeScript") {
-    // Only add if there's already another signal
-    if (score > 0) {
-      score += 5;
-      signals.push(`Language: ${repo.language}`);
-    }
+  // 4. Language bonus (weak signal, only if other signals exist)
+  if (score > 0 && (repo.language === "Rust" || repo.language === "TypeScript")) {
+    score += 5;
+    signals.push(`Language: ${repo.language}`);
   }
 
-  // Cap at 100
   score = Math.min(score, 100);
 
   return {
@@ -87,19 +92,30 @@ export async function analyzeWithHeuristics(
 }
 
 /**
- * Batch-analyze repos with heuristics.
+ * Batch-analyze repos with heuristics (concurrency-limited).
  * Returns only repos that pass the threshold.
  */
 export async function filterPotentialSolanaRepos(
   repos: GitHubRepo[],
   minConfidence: number = 25
 ): Promise<{ repo: GitHubRepo; heuristic: HeuristicResult }[]> {
-  const results = await Promise.all(
-    repos.map(async (repo) => {
-      const heuristic = await analyzeWithHeuristics(repo);
-      return { repo, heuristic };
-    })
-  );
+  const results: { repo: GitHubRepo; heuristic: HeuristicResult }[] = [];
+
+  // Process in batches to limit concurrent file checks
+  for (let i = 0; i < repos.length; i += MAX_FILE_CHECK_CONCURRENCY) {
+    const batch = repos.slice(i, i + MAX_FILE_CHECK_CONCURRENCY);
+    const batchResults = await Promise.all(
+      batch.map(async (repo) => {
+        try {
+          const heuristic = await analyzeWithHeuristics(repo);
+          return { repo, heuristic };
+        } catch {
+          return { repo, heuristic: { isPotentiallySolana: false, confidence: 0, signals: [] } as HeuristicResult };
+        }
+      })
+    );
+    results.push(...batchResults);
+  }
 
   return results.filter((r) => r.heuristic.confidence >= minConfidence);
 }

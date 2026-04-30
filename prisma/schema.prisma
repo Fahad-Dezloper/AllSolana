@@ -1,0 +1,114 @@
+// Solana Open Source Tracker — Prisma Schema
+// Stores discovered projects, AI analysis results, and tracked contributors.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// A discovered open-source project in the Solana ecosystem.
+model Project {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // ─── GitHub Data ───
+  name        String
+  fullName    String  @unique // "owner/repo" — the dedupe key
+  description String?
+  url         String
+  homepage    String?
+  stars       Int     @default(0)
+  forks       Int     @default(0)
+  language    String?
+  topics      String[] // GitHub topics array
+  isFork      Boolean  @default(false)
+  isArchived  Boolean  @default(false)
+  pushedAt    String?  // Last push timestamp from GitHub
+  ghUpdatedAt String?  // GitHub's updatedAt field
+
+  // Owner info
+  ownerLogin     String
+  ownerAvatarUrl String
+
+  defaultBranch String @default("main")
+
+  // ─── AI / Heuristic Analysis ───
+  isSolanaRelated   Boolean @default(true)
+  confidence        Int     @default(60) // 0-100
+  category          String  @default("Other")
+  summary           String  @default("")
+  difficulty        String  @default("Intermediate")
+  keyFeatures       String[] // Array of feature strings
+  contributionAreas String[] // Array of contribution area strings
+  analysisSource    String   @default("heuristic") // "ai" | "heuristic" | "manual"
+
+  // ─── Contribution Metrics ───
+  goodFirstIssues Int @default(0)
+
+  // ─── Relations ───
+  contributors ProjectContributor[]
+
+  // ─── Pipeline Metadata ───
+  lastScannedAt DateTime @default(now()) // When the pipeline last processed this
+  heuristicScore Int     @default(0)     // Heuristic confidence score
+
+  @@index([category])
+  @@index([difficulty])
+  @@index([stars(sort: Desc)])
+  @@index([isSolanaRelated])
+  @@index([lastScannedAt])
+}
+
+/// A tracked ecosystem contributor (Superteam member, ecosystem leader, etc.)
+model TrackedUser {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  github    String @unique // GitHub username
+  name      String
+  role      String @default("Contributor")
+
+  // Stats
+  reposFetched Int @default(0)
+  lastFetchedAt DateTime?
+
+  // Relations
+  contributions ProjectContributor[]
+}
+
+/// Join table: which tracked users contribute to which projects.
+model ProjectContributor {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+
+  user      TrackedUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+
+  @@unique([projectId, userId])
+  @@index([projectId])
+  @@index([userId])
+}
+
+/// Pipeline run log — tracks when the discovery pipeline ran.
+model PipelineRun {
+  id        String   @id @default(cuid())
+  startedAt DateTime @default(now())
+  finishedAt DateTime?
+
+  status          String @default("running") // "running" | "completed" | "failed"
+  totalReposScanned Int   @default(0)
+  totalProjectsFound Int  @default(0)
+  aiAnalysesUsed   Int    @default(0)
+  fallbacksUsed    Int    @default(0)
+  durationMs       Int?
+  error            String?
+}

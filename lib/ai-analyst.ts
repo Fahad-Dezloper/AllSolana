@@ -1,8 +1,12 @@
 /**
  * AI Analysis Layer using Gemini 2.0 Flash via Vercel AI SDK.
  *
- * This is the second-tier classification engine. Repos that pass
- * the heuristic filter are sent here for deep, contextual analysis.
+ * Resilience features:
+ * - If ANY rate limit error occurs, immediately switches ALL remaining
+ *   repos to heuristic fallback (no retries — saves time and quota)
+ * - Budget cap: max 15 repos per run
+ * - Sequential processing with 2s delay between calls
+ * - Graceful fallback when API key is missing
  */
 
 import { google } from "@ai-sdk/google";
@@ -10,6 +14,15 @@ import { generateObject } from "ai";
 import { z } from "zod";
 import { PROJECT_CATEGORIES, DIFFICULTY_LEVELS } from "./config";
 import type { GitHubRepo, AIAnalysis } from "./types";
+
+/** Max repos to analyze with AI per discovery run */
+const MAX_AI_ANALYSES_PER_RUN = 15;
+
+/** Delay between AI requests (ms) to stay under rate limits */
+const DELAY_BETWEEN_REQUESTS_MS = 2_500;
+
+/** If true, skip all AI calls for the rest of this process */
+let aiDisabled = false;
 
 const analysisSchema = z.object({
   isSolanaRelated: z
@@ -40,9 +53,6 @@ const analysisSchema = z.object({
     .describe("Areas where contributors could make an impact (e.g., 'Documentation', 'Testing', 'Feature Development')"),
 });
 
-/**
- * Build the analysis prompt for Gemini.
- */
 function buildPrompt(repo: GitHubRepo, heuristicSignals: string[]): string {
   return `You are a Solana blockchain ecosystem expert. Analyze this GitHub repository and determine if it's related to the Solana ecosystem.
 
@@ -52,73 +62,141 @@ function buildPrompt(repo: GitHubRepo, heuristicSignals: string[]): string {
 - **Language**: ${repo.language ?? "Unknown"}
 - **Topics**: ${repo.topics.length > 0 ? repo.topics.join(", ") : "None"}
 - **Stars**: ${repo.stars} | **Forks**: ${repo.forks}
-- **Last Updated**: ${repo.updatedAt}
 - **URL**: ${repo.url}
 
 ## Heuristic Signals (pre-analysis)
 ${heuristicSignals.map((s) => `- ${s}`).join("\n")}
 
 ## Instructions
-1. Use web search to verify if this project is part of the Solana ecosystem.
-2. Look at the repo name, description, topics, and any context you can find.
-3. Be thorough — some Solana projects don't mention "Solana" directly (e.g., Anchor, Metaplex, Jito, Helius tools).
-4. Classify the project into the right category.
-5. Write a punchy, developer-friendly summary (not generic — make it specific to what this project does).
-6. Estimate contribution difficulty based on the language, project size, and complexity.
-7. Suggest specific areas where new contributors could help.
+1. Look at the repo name, description, topics, and any context you can find.
+2. Be thorough — some Solana projects don't mention "Solana" directly (e.g., Anchor, Metaplex, Jito, Helius tools).
+3. Classify the project into the right category.
+4. Write a punchy, developer-friendly summary (not generic — make it specific to what this project does).
+5. Estimate contribution difficulty based on the language, project size, and complexity.
+6. Suggest specific areas where new contributors could help.
 
 Only mark as Solana-related if you're genuinely confident. We want quality over quantity.`;
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 /**
- * Analyze a repository using Gemini AI.
+ * Build a heuristic-based fallback analysis when AI is unavailable.
+ */
+export function buildFallbackAnalysis(
+  repo: GitHubRepo,
+  heuristicSignals: string[]
+): AIAnalysis {
+  const text = `${repo.name} ${repo.description ?? ""} ${repo.topics.join(" ")}`.toLowerCase();
+  let category: AIAnalysis["category"] = "Other";
+  if (text.includes("defi") || text.includes("swap") || text.includes("amm") || text.includes("lending")) category = "DeFi";
+  else if (text.includes("nft") || text.includes("metaplex") || text.includes("token")) category = "NFT / Digital Assets";
+  else if (text.includes("sdk") || text.includes("lib") || text.includes("client")) category = "SDK / Library";
+  else if (text.includes("tool") || text.includes("cli") || text.includes("devtool")) category = "Developer Tools";
+  else if (text.includes("wallet") || text.includes("phantom") || text.includes("backpack")) category = "Wallet";
+  else if (text.includes("validator") || text.includes("rpc") || text.includes("infra")) category = "Infrastructure";
+  else if (text.includes("dao") || text.includes("governance") || text.includes("vote")) category = "Governance / DAO";
+
+  let difficulty: AIAnalysis["difficulty"] = "Intermediate";
+  if (repo.language === "Rust") difficulty = "Advanced";
+  else if (repo.language === "TypeScript" || repo.language === "JavaScript") difficulty = "Beginner";
+
+  return {
+    isSolanaRelated: true,
+    confidence: 60,
+    category,
+    summary: repo.description ?? `A Solana ecosystem project (${heuristicSignals[0] ?? "detected by heuristics"}).`,
+    difficulty,
+    keyFeatures: repo.topics.slice(0, 3),
+    contributionAreas: ["Documentation", "Testing", "Bug Fixes"],
+  };
+}
+
+/**
+ * Analyze a single repository using Gemini AI.
+ * NO retries — if it fails, immediately use fallback.
  */
 export async function analyzeWithAI(
   repo: GitHubRepo,
   heuristicSignals: string[]
 ): Promise<AIAnalysis> {
+  // Short-circuit if AI is disabled
+  if (aiDisabled) {
+    return buildFallbackAnalysis(repo, heuristicSignals);
+  }
+
+  if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+    aiDisabled = true;
+    console.warn("[AI] No API key configured. Using heuristic fallbacks for all repos.");
+    return buildFallbackAnalysis(repo, heuristicSignals);
+  }
+
   try {
     const { object } = await generateObject({
       model: google("gemini-2.0-flash"),
       schema: analysisSchema,
       prompt: buildPrompt(repo, heuristicSignals),
+      maxRetries: 0, // Disable SDK built-in retries — we handle this ourselves
     });
 
+    console.log(`[AI] ✓ ${repo.fullName} → ${object.category} (${object.confidence}%)`);
     return object;
   } catch (error) {
-    console.error(`AI analysis failed for ${repo.fullName}:`, error);
+    const errMsg = String((error as Error).message ?? "");
 
-    // Fallback: use heuristic data if AI fails
-    return {
-      isSolanaRelated: true, // It passed heuristics, so likely true
-      confidence: 50,
-      category: "Other",
-      summary: repo.description ?? "A Solana ecosystem project.",
-      difficulty: "Intermediate",
-      keyFeatures: [],
-      contributionAreas: ["Documentation", "Testing"],
-    };
+    // ANY rate limit or quota error → disable AI for ALL remaining repos
+    if (
+      errMsg.includes("429") ||
+      errMsg.includes("RESOURCE_EXHAUSTED") ||
+      errMsg.includes("quota") ||
+      errMsg.includes("rate") ||
+      (error as { statusCode?: number }).statusCode === 429
+    ) {
+      console.warn(`[AI] ⚠ Rate limited on ${repo.fullName}. Disabling AI for remaining repos.`);
+      aiDisabled = true;
+      return buildFallbackAnalysis(repo, heuristicSignals);
+    }
+
+    // Any other error → fallback for just this repo
+    console.error(`[AI] ✗ ${repo.fullName}: ${errMsg.slice(0, 150)}`);
+    return buildFallbackAnalysis(repo, heuristicSignals);
   }
 }
 
 /**
- * Batch analyze multiple repos with AI (with concurrency limit).
+ * Batch analyze repos — SEQUENTIAL with delays.
+ * Stops AI calls immediately on first rate limit.
  */
 export async function batchAnalyzeWithAI(
-  repos: { repo: GitHubRepo; signals: string[] }[],
-  concurrency: number = 3
+  repos: { repo: GitHubRepo; signals: string[] }[]
 ): Promise<Map<string, AIAnalysis>> {
   const results = new Map<string, AIAnalysis>();
 
-  // Process in chunks to avoid rate limits
-  for (let i = 0; i < repos.length; i += concurrency) {
-    const chunk = repos.slice(i, i + concurrency);
-    const analyses = await Promise.all(
-      chunk.map(({ repo, signals }) => analyzeWithAI(repo, signals))
-    );
-    chunk.forEach(({ repo }, idx) => {
-      results.set(repo.fullName, analyses[idx]);
-    });
+  // Cap the number of AI analyses
+  const toAnalyze = repos.slice(0, MAX_AI_ANALYSES_PER_RUN);
+  const skipped = repos.length - toAnalyze.length;
+
+  if (skipped > 0) {
+    console.log(`[AI] Budget: ${toAnalyze.length} AI + ${skipped} fallback`);
+  }
+
+  for (let i = 0; i < toAnalyze.length; i++) {
+    const { repo, signals } = toAnalyze[i];
+    const analysis = await analyzeWithAI(repo, signals);
+    results.set(repo.fullName, analysis);
+
+    // Delay between requests (skip if AI just got disabled)
+    if (i < toAnalyze.length - 1 && !aiDisabled) {
+      await sleep(DELAY_BETWEEN_REQUESTS_MS);
+    }
+  }
+
+  // Use fallback for budget-capped repos
+  for (let i = toAnalyze.length; i < repos.length; i++) {
+    const { repo, signals } = repos[i];
+    results.set(repo.fullName, buildFallbackAnalysis(repo, signals));
   }
 
   return results;

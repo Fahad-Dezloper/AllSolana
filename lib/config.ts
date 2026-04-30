@@ -21,16 +21,22 @@ export const TRACKED_USERS: TrackedUser[] = [
   { github: "rajgokal", name: "Raj Gokal", role: "Co-founder, Solana" },
   { github: "jstarry", name: "Justin Starry", role: "Core Engineer, Anza" },
   { github: "buffalu", name: "buffalu", role: "Jito Labs" },
+  { github: "skanev", name: "Stefan Kanev", role: "Solana Core" },
+  { github: "jacobcreech", name: "Jacob Creech", role: "Solana Foundation" },
   
   // Ecosystem Builders
-  { github: "armaniferrante", name: "Armani Ferrante", role: "Founder, Coral (Anchor)" },
+  { github: "armaniferrante", name: "Armani Ferrante", role: "Coral / Backpack" },
   { github: "ngundotra", name: "Noah Gundotra", role: "Helius Labs" },
+  { github: "mertaydogan", name: "Mert Mumtaz", role: "Helius" },
   { github: "0xDeep", name: "Deep Patel", role: "Superteam" },
   { github: "SainyTK", name: "Sainy", role: "Superteam" },
+  { github: "buffalojoel", name: "Joel", role: "Superteam" },
   
   // Infrastructure & Tools
   { github: "CanardMandworkin", name: "Canard", role: "Solana Ecosystem" },
   { github: "ironforge-cloud", name: "Ironforge", role: "Solana RPC" },
+  { github: "laine-sa", name: "Laine", role: "Validator / Tooling" },
+  { github: "jito-foundation", name: "Jito Foundation", role: "Infrastructure" },
 ];
 
 /**

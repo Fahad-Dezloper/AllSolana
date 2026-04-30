@@ -1,7 +1,10 @@
 import { Suspense } from "react";
+import { connection } from "next/server";
 import { getSolanaProjects } from "@/lib/projects";
 import { Dashboard } from "@/components/Dashboard";
 import { ProjectCardSkeleton } from "@/components/ProjectCard";
+import type { ProjectsResponse } from "@/lib/types";
+import { TRACKED_USERS } from "@/lib/config";
 
 /**
  * Loading state while projects are being fetched.
@@ -54,9 +57,27 @@ function DashboardSkeleton() {
 
 /**
  * Server component that fetches and renders the dashboard.
+ * Wrapped in try/catch so the page ALWAYS renders.
  */
 async function ProjectsDashboard() {
-  const data = await getSolanaProjects();
+  // Opt out of static prerendering — this page makes external API calls
+  await connection();
+
+  let data: ProjectsResponse;
+
+  try {
+    data = await getSolanaProjects();
+  } catch (error) {
+    console.error("[Page] Failed to load projects:", error);
+    // Return empty state so the page still renders
+    data = {
+      projects: [],
+      lastUpdated: new Date().toISOString(),
+      totalTrackedUsers: TRACKED_USERS.length,
+      totalReposScanned: 0,
+    };
+  }
+
   return <Dashboard data={data} />;
 }
 

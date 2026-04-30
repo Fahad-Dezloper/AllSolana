@@ -55,11 +55,19 @@ export function Dashboard({ data }: DashboardProps) {
       {/* Hero Section */}
       <header className="pt-16 pb-10 px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-center gap-2 mb-4">
-            <Sparkles size={18} className="text-purple-400" />
-            <span className="text-sm text-purple-400 font-medium tracking-wide">
-              AI-Powered Discovery
-            </span>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-2">
+              <Sparkles size={18} className="text-purple-400" />
+              <span className="text-sm text-purple-400 font-medium tracking-wide">
+                AI-Powered Discovery
+              </span>
+            </div>
+            {data.isSyncing && (
+              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20">
+                <div className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
+                <span className="text-[10px] text-purple-300 font-medium uppercase tracking-wider">Syncing</span>
+              </div>
+            )}
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4 tracking-tight">
             Solana Open Source

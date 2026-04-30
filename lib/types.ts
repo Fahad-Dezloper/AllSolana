@@ -88,4 +88,5 @@ export interface ProjectsResponse {
   lastUpdated: string;
   totalTrackedUsers: number;
   totalReposScanned: number;
+  isSyncing?: boolean;
 }

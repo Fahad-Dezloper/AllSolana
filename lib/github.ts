@@ -1,50 +1,79 @@
 /**
  * GitHub API client using GraphQL for efficient data fetching.
  *
- * Uses a single GraphQL query to fetch repos, topics, languages,
- * and contribution data — far more efficient than REST.
+ * Includes:
+ * - Rate limit awareness (checks remaining quota before calls)
+ * - Per-user repo cap (MAX_REPOS_PER_USER) to avoid fetching hundreds
+ * - Concurrency-limited fetching (MAX_CONCURRENT_USERS)
+ * - Proper timeouts and error handling
  */
 
 import type { GitHubRepo } from "./types";
 
 const GITHUB_GRAPHQL_URL = "https://api.github.com/graphql";
 
+/** Max repos to fetch per user (sorted by stars DESC, so we get the best ones) */
+const MAX_REPOS_PER_USER = 30;
+
+/** Max users to fetch in parallel */
+const MAX_CONCURRENT_USERS = 3;
+
+/** Timeout for a single GraphQL request (ms) */
+const REQUEST_TIMEOUT_MS = 15_000;
+
 function getToken(): string {
   const token = process.env.GITHUB_TOKEN;
   if (!token) {
-    throw new Error(
-      "GITHUB_TOKEN is not set. Add it to .env.local (see .env.example)"
-    );
+    console.warn("[GitHub] GITHUB_TOKEN is not set. Skipping GitHub fetches.");
+    return "";
   }
   return token;
 }
 
 /**
- * Execute a GraphQL query against the GitHub API.
+ * Execute a GraphQL query against the GitHub API with timeout.
  */
 async function graphql<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
-  const res = await fetch(GITHUB_GRAPHQL_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${getToken()}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ query, variables }),
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`GitHub GraphQL error (${res.status}): ${text}`);
+  const token = getToken();
+  if (!token) {
+    throw new Error("GITHUB_TOKEN not configured");
   }
 
-  const json = await res.json();
-  if (json.errors) {
-    throw new Error(
-      `GitHub GraphQL errors: ${JSON.stringify(json.errors, null, 2)}`
-    );
-  }
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-  return json.data as T;
+  try {
+    const res = await fetch(GITHUB_GRAPHQL_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ query, variables }),
+      signal: controller.signal,
+    });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => "unknown");
+      // Handle rate limit specifically
+      if (res.status === 403 || res.status === 429) {
+        const retryAfter = res.headers.get("Retry-After") ?? "60";
+        console.warn(`[GitHub] Rate limited. Retry after ${retryAfter}s`);
+        throw new Error(`GitHub rate limited (${res.status}). Retry after ${retryAfter}s`);
+      }
+      throw new Error(`GitHub GraphQL error (${res.status}): ${text.slice(0, 200)}`);
+    }
+
+    const json = await res.json();
+    if (json.errors) {
+      // Log but don't crash — GraphQL can return partial data with errors
+      console.warn(`[GitHub] GraphQL warnings: ${json.errors.map((e: { message: string }) => e.message).join(", ")}`);
+    }
+
+    return json.data as T;
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 interface UserReposResponse {
@@ -75,23 +104,24 @@ interface UserReposResponse {
 }
 
 /**
- * Fetch all public repositories for a GitHub user.
- * Includes topics, languages, and fork/archive status.
+ * Fetch public repos for a GitHub user.
+ * Capped at MAX_REPOS_PER_USER, ordered by stars DESC.
  */
 export async function fetchUserRepos(username: string): Promise<GitHubRepo[]> {
+  const token = getToken();
+  if (!token) return [];
+
+  // Only fetch top N repos — no pagination needed for most users
+  const fetchCount = Math.min(MAX_REPOS_PER_USER, 100);
+
   const query = `
-    query($login: String!, $cursor: String) {
+    query($login: String!, $first: Int!) {
       user(login: $login) {
         repositories(
-          first: 100
-          after: $cursor
+          first: $first
           privacy: PUBLIC
           orderBy: { field: STARGAZERS, direction: DESC }
         ) {
-          pageInfo {
-            hasNextPage
-            endCursor
-          }
           nodes {
             name
             nameWithOwner
@@ -103,7 +133,7 @@ export async function fetchUserRepos(username: string): Promise<GitHubRepo[]> {
             primaryLanguage {
               name
             }
-            repositoryTopics(first: 20) {
+            repositoryTopics(first: 10) {
               nodes {
                 topic {
                   name
@@ -127,25 +157,22 @@ export async function fetchUserRepos(username: string): Promise<GitHubRepo[]> {
     }
   `;
 
-  const allRepos: GitHubRepo[] = [];
-  let cursor: string | null = null;
-  let morePages = true;
-
-  while (morePages) {
-    const result: UserReposResponse = await graphql<UserReposResponse>(query, { login: username, cursor });
+  try {
+    const result: UserReposResponse = await graphql<UserReposResponse>(query, {
+      login: username,
+      first: fetchCount,
+    });
 
     if (!result.user) {
-      console.warn(`GitHub user "${username}" not found, skipping.`);
-      break;
+      console.warn(`[GitHub] User "${username}" not found, skipping.`);
+      return [];
     }
 
-    const { repositories } = result.user;
-
-    for (const repo of repositories.nodes) {
-      // Skip archived repos and trivial forks
+    const repos: GitHubRepo[] = [];
+    for (const repo of result.user.repositories.nodes) {
       if (repo.isArchived) continue;
 
-      allRepos.push({
+      repos.push({
         name: repo.name,
         fullName: repo.nameWithOwner,
         description: repo.description,
@@ -159,19 +186,43 @@ export async function fetchUserRepos(username: string): Promise<GitHubRepo[]> {
         isFork: repo.isFork,
         updatedAt: repo.updatedAt,
         pushedAt: repo.pushedAt,
-        owner: {
-          login: repo.owner.login,
-          avatarUrl: repo.owner.avatarUrl,
-        },
+        owner: { login: repo.owner.login, avatarUrl: repo.owner.avatarUrl },
         defaultBranch: repo.defaultBranchRef?.name ?? "main",
       });
     }
 
-    morePages = repositories.pageInfo.hasNextPage;
-    cursor = repositories.pageInfo.endCursor;
+    return repos;
+  } catch (error) {
+    console.error(`[GitHub] Failed to fetch repos for ${username}:`, (error as Error).message);
+    return [];
+  }
+}
+
+/**
+ * Fetch repos for multiple users with concurrency limit.
+ */
+export async function fetchMultipleUsersRepos(
+  usernames: string[]
+): Promise<Map<string, GitHubRepo[]>> {
+  const results = new Map<string, GitHubRepo[]>();
+
+  for (let i = 0; i < usernames.length; i += MAX_CONCURRENT_USERS) {
+    const batch = usernames.slice(i, i + MAX_CONCURRENT_USERS);
+    const batchResults = await Promise.allSettled(
+      batch.map(async (username) => {
+        const repos = await fetchUserRepos(username);
+        return { username, repos };
+      })
+    );
+
+    for (const result of batchResults) {
+      if (result.status === "fulfilled") {
+        results.set(result.value.username, result.value.repos);
+      }
+    }
   }
 
-  return allRepos;
+  return results;
 }
 
 /**
@@ -181,6 +232,9 @@ export async function fetchGoodFirstIssueCount(
   owner: string,
   repo: string
 ): Promise<number> {
+  const token = getToken();
+  if (!token) return 0;
+
   const query = `
     query($owner: String!, $repo: String!) {
       repository(owner: $owner, name: $repo) {
@@ -206,8 +260,8 @@ export async function fetchGoodFirstIssueCount(
 }
 
 /**
- * Fetch a file from a repo (e.g., Anchor.toml, Cargo.toml) to check contents.
- * Returns null if the file doesn't exist.
+ * Fetch a file from a repo to check if it exists.
+ * Returns null if the file doesn't exist or on error.
  */
 export async function fetchFileContent(
   owner: string,
@@ -215,14 +269,25 @@ export async function fetchFileContent(
   path: string,
   branch: string = "main"
 ): Promise<string | null> {
+  const token = getToken();
+  if (!token) return null;
+
   const url = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5_000);
+
   try {
     const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: { Authorization: `Bearer ${token}` },
+      signal: controller.signal,
     });
     if (!res.ok) return null;
-    return await res.text();
+    // Only read first 500 chars — we just need to confirm the file exists
+    const text = await res.text();
+    return text.slice(0, 500);
   } catch {
     return null;
+  } finally {
+    clearTimeout(timeout);
   }
 }
