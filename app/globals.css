@@ -4,8 +4,8 @@
   --background: #050505;
   --foreground: #ededed;
   --card-bg: rgba(255, 255, 255, 0.03);
-  --card-border: rgba(255, 255, 255, 0.06);
-  --card-hover: rgba(255, 255, 255, 0.06);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --card-hover: rgba(255, 255, 255, 0.08);
   --accent: #9945FF;
   --accent-secondary: #14F195;
   --accent-glow: rgba(153, 69, 255, 0.15);
@@ -32,6 +32,7 @@
 
 * {
   box-sizing: border-box;
+  border-radius: 0 !important;
 }
 
 html {
@@ -46,32 +47,28 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* === Animated Gradient Background === */
+/* === Grid Background === */
 .gradient-bg {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background:
-    radial-gradient(ellipse 80% 60% at 50% -20%, rgba(153, 69, 255, 0.12), transparent),
-    radial-gradient(ellipse 60% 50% at 80% 50%, rgba(20, 241, 149, 0.06), transparent),
-    radial-gradient(ellipse 60% 50% at 20% 80%, rgba(153, 69, 255, 0.06), transparent),
-    var(--background);
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-color: var(--background);
 }
 
 /* === Glass Card === */
 .glass-card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 16px;
-  backdrop-filter: blur(12px);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background 0.1s ease;
 }
 
 .glass-card:hover {
   background: var(--card-hover);
-  border-color: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 /* === Badges === */
@@ -79,42 +76,43 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 12px;
+  padding: 2px 8px;
+  font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   white-space: nowrap;
+  border: 1px solid transparent;
 }
 
 .badge-accent {
-  background: rgba(153, 69, 255, 0.12);
+  background: rgba(153, 69, 255, 0.1);
   color: #c084fc;
-  border: 1px solid rgba(153, 69, 255, 0.2);
+  border-color: rgba(153, 69, 255, 0.2);
 }
 
 .badge-green {
   background: rgba(20, 241, 149, 0.1);
   color: #34d399;
-  border: 1px solid rgba(20, 241, 149, 0.2);
+  border-color: rgba(20, 241, 149, 0.2);
 }
 
 .badge-neutral {
   background: rgba(255, 255, 255, 0.05);
   color: #aaa;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .badge-orange {
   background: rgba(251, 146, 60, 0.1);
   color: #fb923c;
-  border: 1px solid rgba(251, 146, 60, 0.2);
+  border-color: rgba(251, 146, 60, 0.2);
 }
 
 .badge-red {
   background: rgba(239, 68, 68, 0.1);
   color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.2);
 }
 
 /* === Stat Pill === */
@@ -122,95 +120,87 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 13px;
+  font-size: 12px;
   color: var(--muted);
 }
 
-/* === Shimmer/Skeleton Loading === */
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+/* === Skeleton Loading === */
+.skeleton {
+  background: rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
 }
 
-.skeleton {
+.skeleton::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.03) 25%,
-    rgba(255, 255, 255, 0.06) 50%,
-    rgba(255, 255, 255, 0.03) 75%
+    transparent,
+    rgba(255, 255, 255, 0.05),
+    transparent
   );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s ease-in-out infinite;
-  border-radius: 8px;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 /* === Search Input === */
 .search-input {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
+  background: transparent;
+  border: 1px solid var(--card-border);
   padding: 12px 16px 12px 44px;
   width: 100%;
   color: var(--foreground);
   font-size: 15px;
   outline: none;
-  transition: all 0.2s ease;
-}
-
-.search-input::placeholder {
-  color: var(--muted-2);
 }
 
 .search-input:focus {
-  border-color: rgba(153, 69, 255, 0.4);
-  box-shadow: 0 0 0 3px rgba(153, 69, 255, 0.08);
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.02);
 }
 
 /* === Filter Button === */
 .filter-btn {
-  padding: 8px 16px;
-  border-radius: 999px;
-  font-size: 13px;
+  padding: 6px 12px;
+  font-size: 12px;
   font-weight: 500;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid var(--card-border);
+  background: transparent;
   color: var(--muted);
   cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
 }
 
 .filter-btn:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.05);
   color: var(--foreground);
 }
 
 .filter-btn.active {
-  background: rgba(153, 69, 255, 0.15);
-  border-color: rgba(153, 69, 255, 0.3);
-  color: #c084fc;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
 }
 
-/* === Fade In Animation === */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
+/* === No Animations === */
 .animate-fade-in-up {
-  animation: fadeInUp 0.5s ease-out forwards;
-  opacity: 0;
+  animation: none;
+  opacity: 1;
 }
 
 /* === Scrollbar === */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 
 ::-webkit-scrollbar-track {
@@ -218,10 +208,9 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.2);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.3);
 }

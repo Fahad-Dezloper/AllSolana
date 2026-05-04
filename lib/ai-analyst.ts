@@ -47,21 +47,18 @@ const analysisSchema = z.object({
     .array(z.string())
     .max(5)
     .describe("Top 3-5 key features or technical highlights of this project"),
-  contributionAreas: z
-    .array(z.string())
-    .max(5)
-    .describe("Areas where contributors could make an impact (e.g., 'Documentation', 'Testing', 'Feature Development')"),
 });
 
 function buildPrompt(repo: GitHubRepo, heuristicSignals: string[]): string {
+  const languagesStr = repo.languages.map(l => l.name).join(", ");
+  
   return `You are a Solana blockchain ecosystem expert. Analyze this GitHub repository and determine if it's related to the Solana ecosystem.
-
+  
 ## Repository Details
 - **Name**: ${repo.fullName}
 - **Description**: ${repo.description ?? "No description"}
-- **Language**: ${repo.language ?? "Unknown"}
+- **Languages**: ${languagesStr || "Unknown"}
 - **Topics**: ${repo.topics.length > 0 ? repo.topics.join(", ") : "None"}
-- **Stars**: ${repo.stars} | **Forks**: ${repo.forks}
 - **URL**: ${repo.url}
 
 ## Heuristic Signals (pre-analysis)
@@ -70,10 +67,21 @@ ${heuristicSignals.map((s) => `- ${s}`).join("\n")}
 ## Instructions
 1. Look at the repo name, description, topics, and any context you can find.
 2. Be thorough — some Solana projects don't mention "Solana" directly (e.g., Anchor, Metaplex, Jito, Helius tools).
-3. Classify the project into the right category.
+3. Classify the project STRICTLY into one of these categories:
+   - **DeFi**: Decentralized exchange, lending, borrowing, yield, stablecoins, derivatives.
+   - **NFT / Digital Assets**: NFT marketplaces, standards (Metaplex), collections, minting tools.
+   - **Infrastructure**: Validators, RPC nodes, Geyser plugins, indexing, core protocol tools.
+   - **SDK / Library**: Code libraries for interacting with Solana (e.g., anchor-lang, solana-web3.js, solana-go).
+   - **Developer Tools**: CLI tools, local development environments, debuggers, testing frameworks (bankrun).
+   - **Wallet**: Wallet software, adapters, or key management.
+   - **Gaming**: Game engines on Solana, on-chain games, gaming SDKs.
+   - **Governance / DAO**: Voting systems, multisigs (Squads), governance frameworks (Realms).
+   - **Data / Analytics**: Block explorers, on-chain data dashboards, analytics tools.
+   - **Mobile**: Solana Mobile Stack, SMS-related tools, mobile apps.
+   - **Other**: Anything that doesn't fit the above but IS Solana-related.
+
 4. Write a punchy, developer-friendly summary (not generic — make it specific to what this project does).
 5. Estimate contribution difficulty based on the language, project size, and complexity.
-6. Suggest specific areas where new contributors could help.
 
 Only mark as Solana-related if you're genuinely confident. We want quality over quantity.`;
 }
@@ -100,8 +108,9 @@ export function buildFallbackAnalysis(
   else if (text.includes("dao") || text.includes("governance") || text.includes("vote")) category = "Governance / DAO";
 
   let difficulty: AIAnalysis["difficulty"] = "Intermediate";
-  if (repo.language === "Rust") difficulty = "Advanced";
-  else if (repo.language === "TypeScript" || repo.language === "JavaScript") difficulty = "Beginner";
+  const primaryLang = repo.languages[0]?.name;
+  if (primaryLang === "Rust") difficulty = "Advanced";
+  else if (primaryLang === "TypeScript" || primaryLang === "JavaScript") difficulty = "Beginner";
 
   return {
     isSolanaRelated: true,
@@ -110,7 +119,6 @@ export function buildFallbackAnalysis(
     summary: repo.description ?? `A Solana ecosystem project (${heuristicSignals[0] ?? "detected by heuristics"}).`,
     difficulty,
     keyFeatures: repo.topics.slice(0, 3),
-    contributionAreas: ["Documentation", "Testing", "Bug Fixes"],
   };
 }
 

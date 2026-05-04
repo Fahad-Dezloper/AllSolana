@@ -76,8 +76,8 @@ async function graphql<T>(query: string, variables?: Record<string, unknown>): P
   }
 }
 
-interface UserReposResponse {
-  user: {
+interface RepoOwnerResponse {
+  repositoryOwner: {
     repositories: {
       pageInfo: { hasNextPage: boolean; endCursor: string };
       nodes: Array<{
@@ -88,7 +88,10 @@ interface UserReposResponse {
         homepageUrl: string | null;
         stargazerCount: number;
         forkCount: number;
-        primaryLanguage: { name: string } | null;
+        languages: {
+          edges: Array<{ size: number; node: { name: string } }>;
+        };
+        issues?: { totalCount: number } | null;
         repositoryTopics: {
           nodes: Array<{ topic: { name: string } }>;
         };
@@ -104,7 +107,7 @@ interface UserReposResponse {
 }
 
 /**
- * Fetch public repos for a GitHub user.
+ * Fetch public repos for a GitHub user or organization.
  * Capped at MAX_REPOS_PER_USER, ordered by stars DESC.
  */
 export async function fetchUserRepos(username: string): Promise<GitHubRepo[]> {
@@ -116,7 +119,7 @@ export async function fetchUserRepos(username: string): Promise<GitHubRepo[]> {
 
   const query = `
     query($login: String!, $first: Int!) {
-      user(login: $login) {
+      repositoryOwner(login: $login) {
         repositories(
           first: $first
           privacy: PUBLIC
@@ -130,8 +133,16 @@ export async function fetchUserRepos(username: string): Promise<GitHubRepo[]> {
             homepageUrl
             stargazerCount
             forkCount
-            primaryLanguage {
-              name
+            languages(first: 5, orderBy: { field: SIZE, direction: DESC }) {
+              edges {
+                size
+                node {
+                  name
+                }
+              }
+            }
+            issues(states: OPEN) {
+              totalCount
             }
             repositoryTopics(first: 10) {
               nodes {
@@ -158,18 +169,18 @@ export async function fetchUserRepos(username: string): Promise<GitHubRepo[]> {
   `;
 
   try {
-    const result: UserReposResponse = await graphql<UserReposResponse>(query, {
+    const result: RepoOwnerResponse = await graphql<RepoOwnerResponse>(query, {
       login: username,
       first: fetchCount,
     });
 
-    if (!result.user) {
-      console.warn(`[GitHub] User "${username}" not found, skipping.`);
+    if (!result.repositoryOwner) {
+      console.warn(`[GitHub] Repository owner "${username}" not found, skipping.`);
       return [];
     }
 
     const repos: GitHubRepo[] = [];
-    for (const repo of result.user.repositories.nodes) {
+    for (const repo of result.repositoryOwner.repositories.nodes) {
       if (repo.isArchived) continue;
 
       repos.push({
@@ -180,7 +191,11 @@ export async function fetchUserRepos(username: string): Promise<GitHubRepo[]> {
         homepage: repo.homepageUrl,
         stars: repo.stargazerCount,
         forks: repo.forkCount,
-        language: repo.primaryLanguage?.name ?? null,
+        openIssues: repo.issues?.totalCount ?? 0,
+        languages: repo.languages.edges.map((e) => ({
+          name: e.node.name,
+          size: e.size,
+        })),
         topics: repo.repositoryTopics.nodes.map((t) => t.topic.name),
         isArchived: repo.isArchived,
         isFork: repo.isFork,
@@ -199,64 +214,100 @@ export async function fetchUserRepos(username: string): Promise<GitHubRepo[]> {
 }
 
 /**
- * Fetch repos for multiple users with concurrency limit.
+ * Fetch live data for a batch of repositories by their full names.
  */
-export async function fetchMultipleUsersRepos(
-  usernames: string[]
-): Promise<Map<string, GitHubRepo[]>> {
-  const results = new Map<string, GitHubRepo[]>();
+export async function fetchLiveRepoData(fullNames: string[]): Promise<Map<string, GitHubRepo>> {
+  const result = new Map<string, GitHubRepo>();
+  if (fullNames.length === 0) return result;
 
-  for (let i = 0; i < usernames.length; i += MAX_CONCURRENT_USERS) {
-    const batch = usernames.slice(i, i + MAX_CONCURRENT_USERS);
-    const batchResults = await Promise.allSettled(
-      batch.map(async (username) => {
-        const repos = await fetchUserRepos(username);
-        return { username, repos };
-      })
-    );
-
-    for (const result of batchResults) {
-      if (result.status === "fulfilled") {
-        results.set(result.value.username, result.value.repos);
+  // GraphQL allows multiple aliases to fetch multiple items in one go
+  // But for many repos, we might need multiple calls or a more complex query
+  // For now, we'll process in chunks of 20
+  const chunkSize = 20;
+  for (let i = 0; i < fullNames.length; i += chunkSize) {
+    const chunk = fullNames.slice(i, i + chunkSize);
+    
+    // Generate aliases like repo_0, repo_1... because aliases can't have slashes/dashes
+    const query = `
+      query {
+        ${chunk.map((name, idx) => {
+          const [owner, repo] = name.split("/");
+          return `repo_${idx}: repository(owner: "${owner}", name: "${repo}") {
+            name
+            nameWithOwner
+            description
+            url
+            homepageUrl
+            stargazerCount
+            forkCount
+            languages(first: 5, orderBy: { field: SIZE, direction: DESC }) {
+              edges {
+                size
+                node {
+                  name
+                }
+              }
+            }
+            issues(states: OPEN) {
+              totalCount
+            }
+            repositoryTopics(first: 10) {
+              nodes {
+                topic {
+                  name
+                }
+              }
+            }
+            isArchived
+            isFork
+            updatedAt
+            pushedAt
+            owner {
+              login
+              avatarUrl
+            }
+            defaultBranchRef {
+              name
+            }
+          }`;
+        }).join("\n")}
       }
-    }
-  }
+    `;
 
-  return results;
-}
-
-/**
- * Fetch "good first issue" count for a repository.
- */
-export async function fetchGoodFirstIssueCount(
-  owner: string,
-  repo: string
-): Promise<number> {
-  const token = getToken();
-  if (!token) return 0;
-
-  const query = `
-    query($owner: String!, $repo: String!) {
-      repository(owner: $owner, name: $repo) {
-        issues(
-          states: OPEN
-          labels: ["good first issue", "help wanted"]
-          first: 0
-        ) {
-          totalCount
+    try {
+      const data = await graphql<Record<string, any>>(query);
+      chunk.forEach((name, idx) => {
+        const repo = data[`repo_${idx}`];
+        if (repo) {
+          result.set(name, {
+            name: repo.name,
+            fullName: repo.nameWithOwner,
+            description: repo.description,
+            url: repo.url,
+            homepage: repo.homepageUrl,
+            stars: repo.stargazerCount,
+            forks: repo.forkCount,
+            openIssues: repo.issues?.totalCount ?? 0,
+            languages: repo.languages.edges.map((e: any) => ({
+              name: e.node.name,
+              size: e.size,
+            })),
+            topics: repo.repositoryTopics.nodes.map((t: any) => t.topic.name),
+            isArchived: repo.isArchived,
+            isFork: repo.isFork,
+            updatedAt: repo.updatedAt,
+            pushedAt: repo.pushedAt,
+            owner: { login: repo.owner.login, avatarUrl: repo.owner.avatarUrl },
+            defaultBranch: repo.defaultBranchRef?.name ?? "main",
+          });
         }
-      }
+      });
+    } catch (err) {
+      console.error(`[GitHub] Batch fetch failed:`, (err as Error).message);
     }
-  `;
-
-  try {
-    const data = await graphql<{
-      repository: { issues: { totalCount: number } };
-    }>(query, { owner, repo });
-    return data.repository?.issues?.totalCount ?? 0;
-  } catch {
-    return 0;
   }
+
+  return result;
 }
 
 /**

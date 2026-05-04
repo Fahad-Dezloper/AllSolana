@@ -15,7 +15,8 @@ export interface GitHubRepo {
   homepage: string | null;
   stars: number;
   forks: number;
-  language: string | null;
+  openIssues: number;
+  languages: { name: string; size: number }[];
   topics: string[];
   isArchived: boolean;
   isFork: boolean;
@@ -38,14 +39,13 @@ export interface AIAnalysis {
   summary: string;
   difficulty: DifficultyLevel;
   keyFeatures: string[];
-  contributionAreas: string[];
 }
 
 /**
  * A fully processed Solana project ready for display.
  */
 export interface SolanaProject {
-  // From GitHub
+  // From GitHub (Live)
   name: string;
   fullName: string;
   description: string | null;
@@ -53,20 +53,21 @@ export interface SolanaProject {
   homepage: string | null;
   stars: number;
   forks: number;
-  language: string | null;
+  openIssues: number;
+  languages: { name: string; size: number }[];
   topics: string[];
   updatedAt: string;
+  pushedAt: string;
   owner: {
     login: string;
     avatarUrl: string;
   };
 
-  // From AI Analysis
+  // From AI Analysis (DB)
   category: ProjectCategory;
   summary: string;
   difficulty: DifficultyLevel;
   keyFeatures: string[];
-  contributionAreas: string[];
   confidence: number;
 
   // Tracked contributors who work on this
@@ -75,9 +76,6 @@ export interface SolanaProject {
     name: string;
     role: string;
   }[];
-
-  // Good first issues count (optional)
-  goodFirstIssues?: number;
 }
 
 /**

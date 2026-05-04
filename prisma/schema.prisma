@@ -15,26 +15,9 @@ model Project {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // ─── GitHub Data ───
-  name        String
+  // ─── Core Identity ───
   fullName    String  @unique // "owner/repo" — the dedupe key
-  description String?
-  url         String
-  homepage    String?
-  stars       Int     @default(0)
-  forks       Int     @default(0)
-  language    String?
-  topics      String[] // GitHub topics array
-  isFork      Boolean  @default(false)
-  isArchived  Boolean  @default(false)
-  pushedAt    String?  // Last push timestamp from GitHub
-  ghUpdatedAt String?  // GitHub's updatedAt field
-
-  // Owner info
-  ownerLogin     String
-  ownerAvatarUrl String
-
-  defaultBranch String @default("main")
+  ownerLogin  String
 
   // ─── AI / Heuristic Analysis ───
   isSolanaRelated   Boolean @default(true)
@@ -43,11 +26,7 @@ model Project {
   summary           String  @default("")
   difficulty        String  @default("Intermediate")
   keyFeatures       String[] // Array of feature strings
-  contributionAreas String[] // Array of contribution area strings
   analysisSource    String   @default("heuristic") // "ai" | "heuristic" | "manual"
-
-  // ─── Contribution Metrics ───
-  goodFirstIssues Int @default(0)
 
   // ─── Relations ───
   contributors ProjectContributor[]
@@ -58,7 +37,6 @@ model Project {
 
   @@index([category])
   @@index([difficulty])
-  @@index([stars(sort: Desc)])
   @@index([isSolanaRelated])
   @@index([lastScannedAt])
 }
