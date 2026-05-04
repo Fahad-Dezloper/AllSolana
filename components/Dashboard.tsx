@@ -37,7 +37,7 @@ function Dropdown({
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 border border-white/10 hover:border-white/20 bg-transparent text-[12px] uppercase tracking-wider font-bold transition-colors"
+        className="flex items-center gap-2 h-10 px-4 border border-white/10 hover:bg-white/5 text-[11px] uppercase tracking-wider font-bold transition-colors"
       >
         <span className="text-muted-2">{label}:</span>
         <span className="text-white">
@@ -51,7 +51,7 @@ function Dropdown({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-64 bg-[#0a0a0a] border border-white/10 z-50 shadow-2xl">
+        <div className="absolute top-full left-0 mt-px w-64 bg-[#0a0a0a] border border-white/10 z-50">
           <div className="max-h-64 overflow-y-auto py-1">
             <button
               onClick={() => {
@@ -157,44 +157,61 @@ export function Dashboard({ data }: DashboardProps) {
   };
 
   return (
-    <div className="flex-1 flex flex-col font-sans">
-      <header className="pt-20 pb-12 px-8 border-b border-white/5">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-accent" />
-                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-accent">Terminal v1.0.4</span>
-              </div>
-              <h1 className="text-5xl md:text-7xl font-bold text-white tracking-tighter leading-none">
-                SOLANA<br />
-                <span className="text-muted">CONTRIBUTE</span>
+    <div className="flex-1 flex flex-col font-sans min-h-screen">
+      <header className="sticky top-0 z-30 bg-background border-b border-white/10 px-8 py-4">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2 mb-0.5">
+              <div className="w-1.5 h-1.5 bg-accent" />
+              <h1 className="text-lg font-bold text-white tracking-tighter uppercase">
+                SOLANA <span className="text-muted">CONTRIBUTE</span>
               </h1>
-              <p className="text-[14px] text-muted-2 max-w-lg leading-relaxed uppercase tracking-tight">
-                High-density index of active Solana repositories. 
-                Data synchronized from {data.totalTrackedUsers} ecosystem leads.
-              </p>
             </div>
+            <p className="text-[11px] text-muted-2 uppercase tracking-tight font-medium">
+              High-density index of active repositories // sync from {data.totalTrackedUsers} leads
+            </p>
+          </div>
 
-            <div className="grid grid-cols-2 gap-8 border-l border-white/10 pl-8">
-              <div>
-                <span className="block text-[10px] text-muted-2 uppercase font-bold mb-1">Index Size</span>
-                <span className="text-2xl font-bold font-mono text-white">{data.projects.length}</span>
-              </div>
-              <div>
-                <span className="block text-[10px] text-muted-2 uppercase font-bold mb-1">Last Sync</span>
-                <span className="text-2xl font-bold font-mono text-white">
-                  {new Date(data.lastUpdated).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                </span>
-              </div>
+          <div className="flex items-center gap-8 border-l border-white/10 pl-8 h-10">
+            <div className="flex flex-col justify-center">
+              <span className="text-[9px] text-muted-2 uppercase font-bold tracking-widest leading-none mb-1">Index Size</span>
+              <span className="text-lg font-bold font-mono text-white leading-none">{data.projects.length}</span>
+            </div>
+            <div className="flex flex-col justify-center">
+              <span className="text-[9px] text-muted-2 uppercase font-bold tracking-widest leading-none mb-1">Last Sync</span>
+              <span className="text-lg font-bold font-mono text-white leading-none">
+                {new Date(data.lastUpdated).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+              </span>
             </div>
           </div>
         </div>
       </header>
 
-      <section className="sticky top-0 z-20 bg-background/80 backdrop-blur-md border-b border-white/5 px-8 py-4">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 items-center">
-          <div className="relative flex-1 w-full">
+      <main className="flex-1 px-8 py-12 pb-32">
+        <div className="max-w-7xl mx-auto">
+          {filteredProjects.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {filteredProjects.map((project, i) => (
+                <ProjectCard
+                  key={project.fullName}
+                  project={project}
+                  index={i}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-32 border border-white/10">
+              <Filter size={32} className="text-muted-2 mb-4" />
+              <p className="text-sm text-white font-bold uppercase tracking-widest mb-1">No matches found</p>
+              <p className="text-xs text-muted-2 uppercase tracking-widest">Try relaxing your filters</p>
+            </div>
+          )}
+        </div>
+      </main>
+
+      <section className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-md border-t border-white/10 px-8 py-4">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 items-stretch">
+          <div className="relative flex-1">
             <Search
               size={16}
               className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-2"
@@ -202,14 +219,14 @@ export function Dashboard({ data }: DashboardProps) {
             <input
               id="search-projects"
               type="text"
-              placeholder="SEARCH BY PROJECT, OWNER, OR CATEGORY..."
+              placeholder="SEARCH REPOSITORIES..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="search-input !pl-12 !py-3 !text-[13px] !font-bold !tracking-wider uppercase"
+              className="search-input !pl-12 !h-10 !text-[12px] !font-bold !tracking-wider uppercase !bg-white/5"
             />
           </div>
 
-          <div className="flex items-center gap-2 w-full md:w-auto">
+          <div className="flex items-center gap-px">
             <Dropdown 
               label="CATEGORY" 
               options={allCategories} 
@@ -230,7 +247,7 @@ export function Dashboard({ data }: DashboardProps) {
                   setSelectedCategories(["All"]);
                   setSelectedLanguages(["All"]);
                 }}
-                className="p-2 border border-white/10 hover:bg-white/5 text-muted-2 hover:text-white"
+                className="h-10 px-4 border border-white/10 hover:bg-white/5 text-muted-2 hover:text-white"
                 title="Clear Filters"
               >
                 <X size={16} />
@@ -240,36 +257,10 @@ export function Dashboard({ data }: DashboardProps) {
         </div>
       </section>
 
-      <main className="flex-1 px-8 py-12 bg-[#030303]">
-        <div className="max-w-7xl mx-auto">
-          {filteredProjects.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-px bg-white/5 border border-white/5">
-              {filteredProjects.map((project, i) => (
-                <div key={project.fullName} className="bg-background">
-                  <ProjectCard
-                    project={project}
-                    index={i}
-                  />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-32 border border-dashed border-white/10">
-              <Filter size={32} className="text-muted-2 mb-4" />
-              <p className="text-sm text-white font-bold uppercase tracking-widest mb-1">No matches found</p>
-              <p className="text-xs text-muted-2 uppercase tracking-widest">Try relaxing your filters</p>
-            </div>
-          )}
-        </div>
-      </main>
-
-      <footer className="px-8 py-6 border-t border-white/5 text-[10px] text-muted-2 font-mono uppercase tracking-[0.2em]">
+      <footer className="px-8 py-6 border-t border-white/10 text-[9px] text-muted-2 font-mono uppercase tracking-[0.3em] mb-20">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <p>SOLANA CONTRIBUTION TRACKER // SYSTEM READY</p>
-          <div className="flex items-center gap-6">
-            <span>{data.totalReposScanned} REPOS SCANNED</span>
-            <span>GEMINI ANALYSIS ACTIVE</span>
-          </div>
+          <p>SYSTEM STATUS: READY // REPOS: {data.totalReposScanned}</p>
+          <span>GEMINI ANALYSIS ACTIVE</span>
         </div>
       </footer>
     </div>

@@ -1,20 +1,7 @@
 "use client";
 
-import { Star, GitFork, Tag, Users, ArrowUpRight } from "lucide-react";
+import { Star, GitFork, ArrowUpRight } from "lucide-react";
 import type { SolanaProject } from "@/lib/types";
-
-function getDifficultyBadge(difficulty: string) {
-  switch (difficulty) {
-    case "Beginner":
-      return "badge-green";
-    case "Intermediate":
-      return "badge-orange";
-    case "Advanced":
-      return "badge-red";
-    default:
-      return "badge-neutral";
-  }
-}
 
 function timeAgo(dateStr: string): string {
   const now = Date.now();
@@ -43,17 +30,18 @@ export function ProjectCard({
       target="_blank"
       rel="noopener noreferrer"
       id={`project-${project.fullName.replace("/", "-")}`}
-      className="glass-card p-5 block group cursor-pointer border-l-4 border-l-transparent hover:border-l-accent"
+      className="glass-card p-6 flex flex-col h-full group cursor-pointer border-l-4 border-l-transparent hover:border-l-accent transition-all duration-150"
     >
-      <div className="flex items-start justify-between gap-3 mb-4">
-        <div className="flex items-center gap-3 min-w-0">
+      <div className="flex items-start justify-between gap-3 mb-5">
+        <div className="flex items-center gap-2 min-w-0">
           <img
             src={project.owner.avatarUrl}
             alt={project.owner.login}
             className="w-8 h-8 ring-1 ring-white/10 shrink-0"
+            // w-6 h-6 ring-1 ring-white/5 grayscale group-hover:grayscale-0 transition-all shrink-0
           />
           <div className="min-w-0">
-            <h3 className="text-[14px] font-bold text-white truncate group-hover:text-accent transition-colors uppercase tracking-wider">
+            <h3 className="text-[14px] font-bold text-white truncate uppercase tracking-wider group-hover:text-accent transition-colors">
               {project.name}
             </h3>
             <p className="text-[11px] text-muted truncate font-mono uppercase">{project.owner.login}</p>
@@ -65,47 +53,35 @@ export function ProjectCard({
         />
       </div>
 
-      <p className="text-[13px] text-[#aaa] leading-relaxed mb-6 line-clamp-2 font-light">
+      <p className="text-[13px] text-[#aaa] leading-relaxed mb-6 line-clamp-2 font-light flex-grow">
         {project.summary || project.description || "No description available."}
       </p>
 
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="space-y-1">
-          <span className="text-[10px] text-muted-2 uppercase font-bold tracking-tighter">Category</span>
-          <div className="flex">
-            <span className="badge badge-accent text-[10px]">{project.category}</span>
-          </div>
-        </div>
-        <div className="space-y-1">
-          <span className="text-[10px] text-muted-2 uppercase font-bold tracking-tighter">Languages</span>
-          <div className="flex flex-wrap gap-1">
-            {project.languages.length > 0 ? (
-              project.languages.slice(0, 3).map((lang) => (
-                <span key={lang.name} className="badge badge-neutral text-[10px]">
-                  {lang.name}
-                </span>
-              ))
-            ) : (
-              <span className="badge badge-neutral text-[10px]">Unknown</span>
-            )}
-          </div>
-        </div>
+      <div className="flex flex-wrap gap-1.5 mb-6">
+        <span className="badge badge-accent text-[10px]">
+          {project.category}
+        </span>
+        {project.languages.slice(0, 2).map((lang) => (
+          <span key={lang.name} className="badge badge-neutral text-[10px]">
+            {lang.name}
+          </span>
+        ))}
       </div>
 
-      <div className="flex items-center justify-between pt-4 border-t border-white/5">
+      <div className="flex items-center justify-between pt-4 border-t border-white/5 mt-auto">
         <div className="flex items-center gap-4">
-          <span className="stat-pill">
+          <div className="stat-pill">
             <Star size={12} className="text-muted-2" />
-            <span className="font-mono text-[11px]">{project.stars.toLocaleString()}</span>
-          </span>
-          <span className="stat-pill">
+            <span className="font-mono text-[11px] text-white">{project.stars.toLocaleString()}</span>
+          </div>
+          <div className="stat-pill">
             <GitFork size={12} className="text-muted-2" />
-            <span className="font-mono text-[11px]">{project.forks.toLocaleString()}</span>
-          </span>
-          <span className="stat-pill">
+            <span className="font-mono text-[11px] text-white">{project.forks.toLocaleString()}</span>
+          </div>
+          <div className="stat-pill">
             <div className="w-1.5 h-1.5 bg-accent-secondary" />
-            <span className="font-mono text-[11px] text-accent-secondary">{project.openIssues} Issues</span>
-          </span>
+            <span className="font-mono text-[11px] text-accent-secondary">{project.openIssues} ISSUES</span>
+          </div>
         </div>
         <span className="text-[10px] text-muted-2 font-mono uppercase">
           {timeAgo(project.pushedAt)}
@@ -117,9 +93,9 @@ export function ProjectCard({
 
 export function ProjectCardSkeleton() {
   return (
-    <div className="glass-card p-5">
-      <div className="flex items-center gap-3 mb-3">
-        <div className="skeleton w-9 h-9 rounded-full" />
+    <div className="glass-card p-6 h-full flex flex-col">
+      <div className="flex items-center gap-3 mb-5">
+        <div className="skeleton w-8 h-8" />
         <div className="flex-1">
           <div className="skeleton h-4 w-32 mb-1.5" />
           <div className="skeleton h-3 w-20" />
@@ -127,14 +103,11 @@ export function ProjectCardSkeleton() {
       </div>
       <div className="skeleton h-3 w-full mb-2" />
       <div className="skeleton h-3 w-3/4 mb-4" />
-      <div className="flex gap-1.5 mb-4">
-        <div className="skeleton h-6 w-16 rounded-full" />
-        <div className="skeleton h-6 w-20 rounded-full" />
-        <div className="skeleton h-6 w-14 rounded-full" />
-      </div>
-      <div className="flex gap-4">
-        <div className="skeleton h-3 w-12" />
-        <div className="skeleton h-3 w-10" />
+      <div className="mt-auto pt-4 border-t border-white/5 flex justify-between">
+        <div className="flex gap-4">
+          <div className="skeleton h-3 w-10" />
+          <div className="skeleton h-3 w-10" />
+        </div>
         <div className="skeleton h-3 w-16" />
       </div>
     </div>
