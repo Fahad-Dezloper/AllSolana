@@ -45,7 +45,6 @@ export function ProjectCard({
       id={`project-${project.fullName.replace("/", "-")}`}
       className="glass-card p-5 block group cursor-pointer border-l-4 border-l-transparent hover:border-l-accent"
     >
-      {/* Header */}
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="flex items-center gap-3 min-w-0">
           <img
@@ -66,12 +65,10 @@ export function ProjectCard({
         />
       </div>
 
-      {/* Summary */}
       <p className="text-[13px] text-[#aaa] leading-relaxed mb-6 line-clamp-2 font-light">
         {project.summary || project.description || "No description available."}
       </p>
 
-      {/* Info Grid */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div className="space-y-1">
           <span className="text-[10px] text-muted-2 uppercase font-bold tracking-tighter">Category</span>
@@ -95,7 +92,6 @@ export function ProjectCard({
         </div>
       </div>
 
-      {/* Stats Row */}
       <div className="flex items-center justify-between pt-4 border-t border-white/5">
         <div className="flex items-center gap-4">
           <span className="stat-pill">
@@ -119,9 +115,6 @@ export function ProjectCard({
   );
 }
 
-/**
- * Skeleton loader for ProjectCard.
- */
 export function ProjectCardSkeleton() {
   return (
     <div className="glass-card p-5">

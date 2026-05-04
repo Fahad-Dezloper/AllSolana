@@ -1,39 +1,32 @@
-// Solana Open Source Tracker — Prisma Schema
-// Stores discovered projects, AI analysis results, and tracked contributors.
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-/// A discovered open-source project in the Solana ecosystem.
 model Project {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // ─── Core Identity ───
-  fullName    String  @unique // "owner/repo" — the dedupe key
+  fullName    String  @unique 
   ownerLogin  String
 
-  // ─── AI / Heuristic Analysis ───
   isSolanaRelated   Boolean @default(true)
-  confidence        Int     @default(60) // 0-100
+  confidence        Int     @default(60) 
   category          String  @default("Other")
   summary           String  @default("")
   difficulty        String  @default("Intermediate")
-  keyFeatures       String[] // Array of feature strings
-  analysisSource    String   @default("heuristic") // "ai" | "heuristic" | "manual"
+  keyFeatures       String[] 
+  analysisSource    String   @default("heuristic") 
 
-  // ─── Relations ───
   contributors ProjectContributor[]
 
-  // ─── Pipeline Metadata ───
-  lastScannedAt DateTime @default(now()) // When the pipeline last processed this
-  heuristicScore Int     @default(0)     // Heuristic confidence score
+  lastScannedAt DateTime @default(now()) 
+  heuristicScore Int     @default(0)     
 
   @@index([category])
   @@index([difficulty])
@@ -41,25 +34,21 @@ model Project {
   @@index([lastScannedAt])
 }
 
-/// A tracked ecosystem contributor (Superteam member, ecosystem leader, etc.)
 model TrackedUser {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  github    String @unique // GitHub username
+  github    String @unique 
   name      String
   role      String @default("Contributor")
 
-  // Stats
   reposFetched Int @default(0)
   lastFetchedAt DateTime?
 
-  // Relations
   contributions ProjectContributor[]
 }
 
-/// Join table: which tracked users contribute to which projects.
 model ProjectContributor {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
@@ -75,13 +64,12 @@ model ProjectContributor {
   @@index([userId])
 }
 
-/// Pipeline run log — tracks when the discovery pipeline ran.
 model PipelineRun {
   id        String   @id @default(cuid())
   startedAt DateTime @default(now())
   finishedAt DateTime?
 
-  status          String @default("running") // "running" | "completed" | "failed"
+  status          String @default("running") 
   totalReposScanned Int   @default(0)
   totalProjectsFound Int  @default(0)
   aiAnalysesUsed   Int    @default(0)

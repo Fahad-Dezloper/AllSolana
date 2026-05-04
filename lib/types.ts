@@ -1,12 +1,5 @@
-/**
- * Shared type definitions for the Solana Open Source Tracker.
- */
-
 import type { ProjectCategory, DifficultyLevel } from "./config";
 
-/**
- * Raw repository data from GitHub API.
- */
 export interface GitHubRepo {
   name: string;
   fullName: string;
@@ -29,23 +22,16 @@ export interface GitHubRepo {
   defaultBranch: string;
 }
 
-/**
- * AI analysis result from Gemini.
- */
 export interface AIAnalysis {
   isSolanaRelated: boolean;
-  confidence: number; // 0-100
+  confidence: number;
   category: ProjectCategory;
   summary: string;
   difficulty: DifficultyLevel;
   keyFeatures: string[];
 }
 
-/**
- * A fully processed Solana project ready for display.
- */
 export interface SolanaProject {
-  // From GitHub (Live)
   name: string;
   fullName: string;
   description: string | null;
@@ -63,14 +49,12 @@ export interface SolanaProject {
     avatarUrl: string;
   };
 
-  // From AI Analysis (DB)
   category: ProjectCategory;
   summary: string;
   difficulty: DifficultyLevel;
   keyFeatures: string[];
   confidence: number;
 
-  // Tracked contributors who work on this
   trackedContributors: {
     github: string;
     name: string;
@@ -78,9 +62,6 @@ export interface SolanaProject {
   }[];
 }
 
-/**
- * Response from the projects API.
- */
 export interface ProjectsResponse {
   projects: SolanaProject[];
   lastUpdated: string;

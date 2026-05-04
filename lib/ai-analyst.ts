@@ -1,52 +1,21 @@
-/**
- * AI Analysis Layer using Gemini 2.0 Flash via Vercel AI SDK.
- *
- * Resilience features:
- * - If ANY rate limit error occurs, immediately switches ALL remaining
- *   repos to heuristic fallback (no retries — saves time and quota)
- * - Budget cap: max 15 repos per run
- * - Sequential processing with 2s delay between calls
- * - Graceful fallback when API key is missing
- */
-
 import { google } from "@ai-sdk/google";
 import { generateObject } from "ai";
 import { z } from "zod";
 import { PROJECT_CATEGORIES, DIFFICULTY_LEVELS } from "./config";
 import type { GitHubRepo, AIAnalysis } from "./types";
 
-/** Max repos to analyze with AI per discovery run */
 const MAX_AI_ANALYSES_PER_RUN = 15;
-
-/** Delay between AI requests (ms) to stay under rate limits */
 const DELAY_BETWEEN_REQUESTS_MS = 2_500;
 
-/** If true, skip all AI calls for the rest of this process */
 let aiDisabled = false;
 
 const analysisSchema = z.object({
-  isSolanaRelated: z
-    .boolean()
-    .describe("Whether this repository is related to the Solana blockchain ecosystem"),
-  confidence: z
-    .number()
-    .min(0)
-    .max(100)
-    .describe("Confidence score from 0-100 on how sure you are"),
-  category: z
-    .enum(PROJECT_CATEGORIES)
-    .describe("The primary category this project belongs to"),
-  summary: z
-    .string()
-    .max(200)
-    .describe("A concise, punchy 1-2 sentence description for developers looking to contribute"),
-  difficulty: z
-    .enum(DIFFICULTY_LEVELS)
-    .describe("How difficult it would be for a new contributor to start working on this project"),
-  keyFeatures: z
-    .array(z.string())
-    .max(5)
-    .describe("Top 3-5 key features or technical highlights of this project"),
+  isSolanaRelated: z.boolean(),
+  confidence: z.number().min(0).max(100),
+  category: z.enum(PROJECT_CATEGORIES),
+  summary: z.string().max(200),
+  difficulty: z.enum(DIFFICULTY_LEVELS),
+  keyFeatures: z.array(z.string()).max(5),
 });
 
 function buildPrompt(repo: GitHubRepo, heuristicSignals: string[]): string {
@@ -90,9 +59,6 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-/**
- * Build a heuristic-based fallback analysis when AI is unavailable.
- */
 export function buildFallbackAnalysis(
   repo: GitHubRepo,
   heuristicSignals: string[]
@@ -122,15 +88,10 @@ export function buildFallbackAnalysis(
   };
 }
 
-/**
- * Analyze a single repository using Gemini AI.
- * NO retries — if it fails, immediately use fallback.
- */
 export async function analyzeWithAI(
   repo: GitHubRepo,
   heuristicSignals: string[]
 ): Promise<AIAnalysis> {
-  // Short-circuit if AI is disabled
   if (aiDisabled) {
     return buildFallbackAnalysis(repo, heuristicSignals);
   }
@@ -146,7 +107,7 @@ export async function analyzeWithAI(
       model: google("gemini-2.0-flash"),
       schema: analysisSchema,
       prompt: buildPrompt(repo, heuristicSignals),
-      maxRetries: 0, // Disable SDK built-in retries — we handle this ourselves
+      maxRetries: 0,
     });
 
     console.log(`[AI] ✓ ${repo.fullName} → ${object.category} (${object.confidence}%)`);
@@ -154,7 +115,6 @@ export async function analyzeWithAI(
   } catch (error) {
     const errMsg = String((error as Error).message ?? "");
 
-    // ANY rate limit or quota error → disable AI for ALL remaining repos
     if (
       errMsg.includes("429") ||
       errMsg.includes("RESOURCE_EXHAUSTED") ||
@@ -167,22 +127,16 @@ export async function analyzeWithAI(
       return buildFallbackAnalysis(repo, heuristicSignals);
     }
 
-    // Any other error → fallback for just this repo
     console.error(`[AI] ✗ ${repo.fullName}: ${errMsg.slice(0, 150)}`);
     return buildFallbackAnalysis(repo, heuristicSignals);
   }
 }
 
-/**
- * Batch analyze repos — SEQUENTIAL with delays.
- * Stops AI calls immediately on first rate limit.
- */
 export async function batchAnalyzeWithAI(
   repos: { repo: GitHubRepo; signals: string[] }[]
 ): Promise<Map<string, AIAnalysis>> {
   const results = new Map<string, AIAnalysis>();
 
-  // Cap the number of AI analyses
   const toAnalyze = repos.slice(0, MAX_AI_ANALYSES_PER_RUN);
   const skipped = repos.length - toAnalyze.length;
 
@@ -195,13 +149,11 @@ export async function batchAnalyzeWithAI(
     const analysis = await analyzeWithAI(repo, signals);
     results.set(repo.fullName, analysis);
 
-    // Delay between requests (skip if AI just got disabled)
     if (i < toAnalyze.length - 1 && !aiDisabled) {
       await sleep(DELAY_BETWEEN_REQUESTS_MS);
     }
   }
 
-  // Use fallback for budget-capped repos
   for (let i = toAnalyze.length; i < repos.length; i++) {
     const { repo, signals } = repos[i];
     results.set(repo.fullName, buildFallbackAnalysis(repo, signals));

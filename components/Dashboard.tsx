@@ -158,7 +158,6 @@ export function Dashboard({ data }: DashboardProps) {
 
   return (
     <div className="flex-1 flex flex-col font-sans">
-      {/* Header */}
       <header className="pt-20 pb-12 px-8 border-b border-white/5">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
@@ -193,10 +192,8 @@ export function Dashboard({ data }: DashboardProps) {
         </div>
       </header>
 
-      {/* Control Bar */}
       <section className="sticky top-0 z-20 bg-background/80 backdrop-blur-md border-b border-white/5 px-8 py-4">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 items-center">
-          {/* Search */}
           <div className="relative flex-1 w-full">
             <Search
               size={16}
@@ -212,7 +209,6 @@ export function Dashboard({ data }: DashboardProps) {
             />
           </div>
 
-          {/* Dropdown Filters */}
           <div className="flex items-center gap-2 w-full md:w-auto">
             <Dropdown 
               label="CATEGORY" 
@@ -244,7 +240,6 @@ export function Dashboard({ data }: DashboardProps) {
         </div>
       </section>
 
-      {/* Main Content */}
       <main className="flex-1 px-8 py-12 bg-[#030303]">
         <div className="max-w-7xl mx-auto">
           {filteredProjects.length > 0 ? (
@@ -268,7 +263,6 @@ export function Dashboard({ data }: DashboardProps) {
         </div>
       </main>
 
-      {/* Footer */}
       <footer className="px-8 py-6 border-t border-white/5 text-[10px] text-muted-2 font-mono uppercase tracking-[0.2em]">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <p>SOLANA CONTRIBUTION TRACKER // SYSTEM READY</p>

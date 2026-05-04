@@ -6,13 +6,9 @@ import { ProjectCardSkeleton } from "@/components/ProjectCard";
 import type { ProjectsResponse } from "@/lib/types";
 import { TRACKED_USERS } from "@/lib/config";
 
-/**
- * Loading state while projects are being fetched.
- */
 function DashboardSkeleton() {
   return (
     <div className="flex-1 flex flex-col">
-      {/* Hero Skeleton */}
       <header className="pt-16 pb-10 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="skeleton h-4 w-36 mb-4 rounded-full" />
@@ -28,7 +24,6 @@ function DashboardSkeleton() {
         </div>
       </header>
 
-      {/* Filters Skeleton */}
       <section className="px-6 pb-6">
         <div className="max-w-6xl mx-auto">
           <div className="skeleton h-12 w-full mb-4 rounded-xl" />
@@ -40,7 +35,6 @@ function DashboardSkeleton() {
         </div>
       </section>
 
-      {/* Grid Skeleton */}
       <main className="flex-1 px-6 py-8">
         <div className="max-w-6xl mx-auto">
           <div className="skeleton h-4 w-32 mb-6" />
@@ -55,12 +49,7 @@ function DashboardSkeleton() {
   );
 }
 
-/**
- * Server component that fetches and renders the dashboard.
- * Wrapped in try/catch so the page ALWAYS renders.
- */
 async function ProjectsDashboard() {
-  // Opt out of static prerendering — this page makes external API calls
   await connection();
 
   let data: ProjectsResponse;
@@ -69,7 +58,6 @@ async function ProjectsDashboard() {
     data = await getSolanaProjects();
   } catch (error) {
     console.error("[Page] Failed to load projects:", error);
-    // Return empty state so the page still renders
     data = {
       projects: [],
       lastUpdated: new Date().toISOString(),

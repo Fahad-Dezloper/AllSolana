@@ -1,24 +1,9 @@
-/**
- * GitHub API client using GraphQL for efficient data fetching.
- *
- * Includes:
- * - Rate limit awareness (checks remaining quota before calls)
- * - Per-user repo cap (MAX_REPOS_PER_USER) to avoid fetching hundreds
- * - Concurrency-limited fetching (MAX_CONCURRENT_USERS)
- * - Proper timeouts and error handling
- */
-
 import type { GitHubRepo } from "./types";
 
 const GITHUB_GRAPHQL_URL = "https://api.github.com/graphql";
 
-/** Max repos to fetch per user (sorted by stars DESC, so we get the best ones) */
 const MAX_REPOS_PER_USER = 30;
-
-/** Max users to fetch in parallel */
 const MAX_CONCURRENT_USERS = 3;
-
-/** Timeout for a single GraphQL request (ms) */
 const REQUEST_TIMEOUT_MS = 15_000;
 
 function getToken(): string {
@@ -30,9 +15,6 @@ function getToken(): string {
   return token;
 }
 
-/**
- * Execute a GraphQL query against the GitHub API with timeout.
- */
 async function graphql<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
   const token = getToken();
   if (!token) {
@@ -55,7 +37,6 @@ async function graphql<T>(query: string, variables?: Record<string, unknown>): P
 
     if (!res.ok) {
       const text = await res.text().catch(() => "unknown");
-      // Handle rate limit specifically
       if (res.status === 403 || res.status === 429) {
         const retryAfter = res.headers.get("Retry-After") ?? "60";
         console.warn(`[GitHub] Rate limited. Retry after ${retryAfter}s`);
@@ -66,7 +47,6 @@ async function graphql<T>(query: string, variables?: Record<string, unknown>): P
 
     const json = await res.json();
     if (json.errors) {
-      // Log but don't crash — GraphQL can return partial data with errors
       console.warn(`[GitHub] GraphQL warnings: ${json.errors.map((e: { message: string }) => e.message).join(", ")}`);
     }
 
@@ -106,15 +86,10 @@ interface RepoOwnerResponse {
   };
 }
 
-/**
- * Fetch public repos for a GitHub user or organization.
- * Capped at MAX_REPOS_PER_USER, ordered by stars DESC.
- */
 export async function fetchUserRepos(username: string): Promise<GitHubRepo[]> {
   const token = getToken();
   if (!token) return [];
 
-  // Only fetch top N repos — no pagination needed for most users
   const fetchCount = Math.min(MAX_REPOS_PER_USER, 100);
 
   const query = `
@@ -213,21 +188,14 @@ export async function fetchUserRepos(username: string): Promise<GitHubRepo[]> {
   }
 }
 
-/**
- * Fetch live data for a batch of repositories by their full names.
- */
 export async function fetchLiveRepoData(fullNames: string[]): Promise<Map<string, GitHubRepo>> {
   const result = new Map<string, GitHubRepo>();
   if (fullNames.length === 0) return result;
 
-  // GraphQL allows multiple aliases to fetch multiple items in one go
-  // But for many repos, we might need multiple calls or a more complex query
-  // For now, we'll process in chunks of 20
   const chunkSize = 20;
   for (let i = 0; i < fullNames.length; i += chunkSize) {
     const chunk = fullNames.slice(i, i + chunkSize);
     
-    // Generate aliases like repo_0, repo_1... because aliases can't have slashes/dashes
     const query = `
       query {
         ${chunk.map((name, idx) => {
@@ -310,10 +278,6 @@ export async function fetchLiveRepoData(fullNames: string[]): Promise<Map<string
   return result;
 }
 
-/**
- * Fetch a file from a repo to check if it exists.
- * Returns null if the file doesn't exist or on error.
- */
 export async function fetchFileContent(
   owner: string,
   repo: string,
@@ -333,7 +297,6 @@ export async function fetchFileContent(
       signal: controller.signal,
     });
     if (!res.ok) return null;
-    // Only read first 500 chars — we just need to confirm the file exists
     const text = await res.text();
     return text.slice(0, 500);
   } catch {

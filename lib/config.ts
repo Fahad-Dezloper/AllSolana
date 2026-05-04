@@ -1,22 +1,10 @@
-/**
- * Configuration for the Solana Open Source Tracker.
- *
- * This file contains the curated list of ecosystem leaders and
- * Superteam members whose GitHub activity we track.
- */
-
 export interface TrackedUser {
   github: string;
   name: string;
   role: string;
 }
 
-/**
- * Curated list of Solana ecosystem contributors.
- * Add GitHub handles here to track their open-source contributions.
- */
 export const TRACKED_USERS: TrackedUser[] = [
-  // Solana Labs / Anza / Core
   { github: "aeyakovenko", name: "Anatoly Yakovenko", role: "Co-founder, Solana" },
   { github: "rajgokal", name: "Raj Gokal", role: "Co-founder, Solana" },
   { github: "jstarry", name: "Justin Starry", role: "Core Engineer, Anza" },
@@ -24,7 +12,6 @@ export const TRACKED_USERS: TrackedUser[] = [
   { github: "skanev", name: "Stefan Kanev", role: "Solana Core" },
   { github: "jacobcreech", name: "Jacob Creech", role: "Solana Foundation" },
   
-  // Ecosystem Builders
   { github: "armaniferrante", name: "Armani Ferrante", role: "Coral / Backpack" },
   { github: "ngundotra", name: "Noah Gundotra", role: "Helius Labs" },
   { github: "mertaydogan", name: "Mert Mumtaz", role: "Helius" },
@@ -32,16 +19,12 @@ export const TRACKED_USERS: TrackedUser[] = [
   { github: "SainyTK", name: "Sainy", role: "Superteam" },
   { github: "buffalojoel", name: "Joel", role: "Superteam" },
   
-  // Infrastructure & Tools
   { github: "CanardMandworkin", name: "Canard", role: "Solana Ecosystem" },
   { github: "ironforge-cloud", name: "Ironforge", role: "Solana RPC" },
   { github: "laine-sa", name: "Laine", role: "Validator / Tooling" },
   { github: "jito-foundation", name: "Jito Foundation", role: "Infrastructure" },
 ];
 
-/**
- * Keywords and patterns used by the heuristic Solana detector.
- */
 export const SOLANA_KEYWORDS = [
   "solana",
   "anchor",
@@ -107,9 +90,6 @@ export const SOLANA_TOPICS = [
   "solana-ecosystem",
 ];
 
-/**
- * Project categories for classification.
- */
 export const PROJECT_CATEGORIES = [
   "DeFi",
   "NFT / Digital Assets",
@@ -130,6 +110,6 @@ export const DIFFICULTY_LEVELS = [
   "Beginner",
   "Intermediate",
   "Advanced",
-] as const;
+ ] as const;
 
 export type DifficultyLevel = (typeof DIFFICULTY_LEVELS)[number];

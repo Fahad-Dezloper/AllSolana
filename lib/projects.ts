@@ -5,21 +5,11 @@ import { filterPotentialSolanaRepos } from "./solana-detector";
 import { batchAnalyzeWithAI } from "./ai-analyst";
 import type { SolanaProject, ProjectsResponse, GitHubRepo } from "./types";
 
-/** How old the discovery pipeline results can be before we trigger a background refresh */
-const STALE_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24 hours (Identity doesn't change often)
+const STALE_THRESHOLD_MS = 24 * 60 * 60 * 1000;
 
-/** Whether a pipeline run is currently in-flight */
 let pipelineRunning = false;
 
-// ─────────────────────────────────────────────────────
-// PUBLIC API — called by the page
-// ─────────────────────────────────────────────────────
-
-/**
- * Get projects from the database and enrich them with LIVE data from GitHub.
- */
 export async function getSolanaProjects(): Promise<ProjectsResponse> {
-  // 1. Read project identities and AI metadata from DB
   const dbProjects = await prisma.project.findMany({
     where: { isSolanaRelated: true },
     include: {
@@ -29,18 +19,15 @@ export async function getSolanaProjects(): Promise<ProjectsResponse> {
     },
   });
 
-  // 2. Fetch LIVE stats for all these projects from GitHub
   const fullNames = dbProjects.map(p => p.fullName);
   const liveDataMap = await fetchLiveRepoData(fullNames);
 
-  // 3. Merge DB data with live GitHub data
   const mergedProjects: SolanaProject[] = dbProjects
     .map((p) => {
       const live = liveDataMap.get(p.fullName);
-      if (!live) return null; // If repo was deleted or renamed, skip for now
+      if (!live) return null;
 
       return {
-        // Live Data
         name: live.name,
         fullName: live.fullName,
         description: live.description,
@@ -58,14 +45,12 @@ export async function getSolanaProjects(): Promise<ProjectsResponse> {
           avatarUrl: live.owner.avatarUrl,
         },
 
-        // AI Analysis (Persistent)
         category: p.category as SolanaProject["category"],
         summary: p.summary,
         difficulty: p.difficulty as SolanaProject["difficulty"],
         keyFeatures: p.keyFeatures,
         confidence: p.confidence,
 
-        // Contributors
         trackedContributors: p.contributors.map((c) => ({
           github: c.user.github,
           name: c.user.name,
@@ -75,10 +60,8 @@ export async function getSolanaProjects(): Promise<ProjectsResponse> {
     })
     .filter((p): p is SolanaProject => p !== null);
 
-  // 4. Sort by live stars (descending)
   mergedProjects.sort((a, b) => b.stars - a.stars);
 
-  // 5. Check if we need to refresh the discovery pipeline
   const lastRun = await prisma.pipelineRun.findFirst({
     where: { status: "completed" },
     orderBy: { finishedAt: "desc" },
@@ -88,7 +71,6 @@ export async function getSolanaProjects(): Promise<ProjectsResponse> {
     Date.now() - lastRun.finishedAt.getTime() > STALE_THRESHOLD_MS;
 
   if (mergedProjects.length === 0 || (isStale && !pipelineRunning)) {
-    console.log("[Projects] Discovery stale or empty. Triggering refresh...");
     runDiscoveryPipeline().catch((err) =>
       console.error("[Projects] Background refresh failed:", err)
     );
@@ -103,10 +85,6 @@ export async function getSolanaProjects(): Promise<ProjectsResponse> {
   };
 }
 
-// ─────────────────────────────────────────────────────
-// DISCOVERY PIPELINE → writes project identity & AI info to DB
-// ─────────────────────────────────────────────────────
-
 async function runDiscoveryPipeline(): Promise<void> {
   if (pipelineRunning) return;
   pipelineRunning = true;
@@ -119,7 +97,6 @@ async function runDiscoveryPipeline(): Promise<void> {
   try {
     await syncTrackedUsers();
 
-    // Fetch all repos for all tracked users
     const userHandles = TRACKED_USERS.map((u) => u.github);
     const repoOwnerMap = new Map<string, GitHubRepo[]>();
     
@@ -128,7 +105,6 @@ async function runDiscoveryPipeline(): Promise<void> {
       repoOwnerMap.set(handle, repos);
     }
 
-    // Deduplicate
     const repoMap = new Map<string, { repo: GitHubRepo; contributors: typeof TRACKED_USERS }>();
     let totalScanned = 0;
 
@@ -145,18 +121,15 @@ async function runDiscoveryPipeline(): Promise<void> {
       }
     }
 
-    // Heuristics
     const allUniqueRepos = Array.from(repoMap.values()).map(r => r.repo);
     const potentialSolana = await filterPotentialSolanaRepos(allUniqueRepos);
     
-    // AI Analysis
     const reposForAI = potentialSolana.map(({ repo, heuristic }) => ({
       repo,
       signals: heuristic.signals,
     }));
     const aiResults = await batchAnalyzeWithAI(reposForAI);
 
-    // Persist
     let projectsFound = 0;
     let aiCount = 0;
     let fallbackCount = 0;
@@ -196,7 +169,6 @@ async function runDiscoveryPipeline(): Promise<void> {
         },
       });
 
-      // Link contributors
       const contributors = repoMap.get(repo.fullName)?.contributors ?? [];
       for (const c of contributors) {
         const dbUser = await prisma.trackedUser.findUnique({ where: { github: c.github } });
