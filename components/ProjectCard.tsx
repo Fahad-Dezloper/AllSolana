@@ -30,7 +30,7 @@ export function ProjectCard({
       target="_blank"
       rel="noopener noreferrer"
       id={`project-${project.fullName.replace("/", "-")}`}
-      className="bg-fd-card p-6 flex flex-col h-full group cursor-pointer border-l-4 border-l-transparent hover:border-l-accent transition-all duration-150"
+      className="bg-fd-card p-6 flex flex-col h-full group cursor-pointer border-l border-l-transparent hover:border-l-accent transition-all duration-150"
     >
       <div className="flex items-start justify-between gap-3 mb-5">
         <div className="flex items-center gap-2 min-w-0">

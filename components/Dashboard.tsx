@@ -98,7 +98,7 @@ export function Dashboard({ data }: DashboardProps) {
     <div className="flex-1 flex flex-col font-sans min-h-screen">
       <TopBar projectsCount={data.projects.length} />
 
-      <main className="flex-1 px-8 py-12 pb-32">
+      <main className="flex-1 px-8 py-6 pb-32">
         <div className="max-w-8xl mx-auto">
           {filteredProjects.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
