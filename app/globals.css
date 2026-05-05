@@ -230,3 +230,12 @@ body {
     --tw-bg-opacity: 1;
     background-color: hsl(var(--fd-card) / var(--tw-bg-opacity, 1));
 }
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

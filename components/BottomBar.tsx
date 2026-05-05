@@ -37,7 +37,8 @@ function Dropdown({ label, options, selected, onToggle }: DropdownProps) {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-widest text-neutral-400 transition-all hover:bg-neutral-800 hover:text-white"
       >
-        <span className="text-neutral-500">{label}:</span>
+        <span className="text-neutral-500 hidden sm:inline">{label}:</span>
+        <span className="text-neutral-500 sm:hidden">{label.slice(0, 1)}:</span>
         <span className="transition-all duration-300">
           {displaySelected.length === 0 || displaySelected.includes("All")
             ? "ALL"
@@ -141,7 +142,8 @@ function SortDropdown({ current, onSelect }: { current: string, onSelect: (val: 
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-widest text-neutral-400 transition-all hover:bg-neutral-800 hover:text-white"
       >
-        <span className="text-neutral-500">SORT:</span>
+        <span className="text-neutral-500 hidden sm:inline">SORT:</span>
+        <span className="text-neutral-500 sm:hidden">S:</span>
         <span>{currentLabel}</span>
         <ChevronDown size={14} className={`transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
       </button>
@@ -190,8 +192,8 @@ export function BottomBar({
     search !== "";
 
   return (
-    <section className="fixed bottom-6 left-0 right-0 z-40 px-4 flex justify-center">
-      <div className="flex items-center gap-1.5 rounded-full border border-neutral-700/50 bg-neutral-900/90 px-2 py-2 shadow-2xl shadow-black/50 backdrop-blur-xl sm:gap-2 sm:px-3">
+    <section className="fixed bottom-6 left-0 right-0 z-40 px-2 sm:px-4 flex justify-center">
+      <div className="flex items-center gap-1 sm:gap-2 rounded-full border border-neutral-700/50 bg-neutral-900/90 px-1.5 sm:px-3 py-1.5 sm:py-2 shadow-2xl shadow-black/50 backdrop-blur-xl max-w-full overflow-x-auto no-scrollbar">
         
         {/* Search Section */}
         <div className="relative flex items-center">
@@ -202,7 +204,7 @@ export function BottomBar({
             placeholder="SEARCH..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-32 sm:w-48 bg-transparent pl-9 pr-3 py-1.5 text-[11px] font-bold tracking-wider uppercase text-white placeholder:text-neutral-600 focus:outline-none transition-all focus:w-40 sm:focus:w-64"
+            className="w-20 sm:w-48 bg-transparent pl-8 sm:pl-9 pr-2 sm:pr-3 py-1.5 text-[11px] font-bold tracking-wider uppercase text-white placeholder:text-neutral-600 focus:outline-none transition-all focus:w-28 sm:focus:w-64"
           />
         </div>
 

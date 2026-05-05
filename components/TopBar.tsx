@@ -8,7 +8,7 @@ interface TopBarProps {
 
 export function TopBar({ projectsCount }: TopBarProps) {
   return (
-    <header className="sticky top-0 z-30 bg-background border-b border-white/10 px-8 py-2">
+    <header className="sticky top-0 z-30 bg-background border-b border-white/10 px-4 sm:px-8 py-3 sm:py-2">
       <div className="max-w-8xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex flex-col">
           <div className="flex items-center gap-2 mb-0.5">
@@ -25,12 +25,12 @@ export function TopBar({ projectsCount }: TopBarProps) {
               CONTRIBUTE
             </h1>
           </div>
-          <p className="text-[11px] text-muted-2 uppercase tracking-tight font-medium">
+          <p className="text-[10px] sm:text-[11px] text-muted-2 uppercase tracking-tight font-medium">
             High-density index of active repositories on Solana
           </p>
         </div>
 
-        <div className="flex items-center gap-8 border-l border-white/10 pl-8 h-10">
+        <div className="flex items-center gap-8 border-l-0 md:border-l border-white/10 md:pl-8 h-auto md:h-10">
           <div className="flex flex-col justify-center">
             <span className="text-[9px] text-muted-2 uppercase font-bold tracking-widest leading-none mb-1">
               Index Size

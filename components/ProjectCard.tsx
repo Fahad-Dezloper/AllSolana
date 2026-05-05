@@ -30,7 +30,7 @@ export function ProjectCard({
       target="_blank"
       rel="noopener noreferrer"
       id={`project-${project.fullName.replace("/", "-")}`}
-      className="bg-fd-card p-6 flex flex-col h-full min-h-[240px] group cursor-pointer border-l border-l-transparent hover:border-l-solana-green transition-all duration-150"
+      className="bg-fd-card p-5 sm:p-6 flex flex-col h-full min-h-[240px] group cursor-pointer border-l border-l-transparent hover:border-l-solana-green transition-all duration-150"
     >
       <div className="flex items-start justify-between gap-3 mb-5">
         <div className="flex items-center gap-2 min-w-0">
@@ -71,7 +71,7 @@ export function ProjectCard({
       </div>
 
       <div className="flex items-center justify-between pt-4 border-t border-white/5 mt-auto">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
           <div className="stat-pill">
             <Star size={12} className="text-muted-2" />
             <span className="font-mono text-[11px] text-white">{(project.stars || 0).toLocaleString()}</span>
@@ -95,7 +95,7 @@ export function ProjectCard({
 
 export function ProjectCardSkeleton() {
   return (
-    <div className="bg-fd-card p-6 h-full min-h-[240px] flex flex-col border-l border-l-transparent">
+    <div className="bg-fd-card p-5 sm:p-6 h-full min-h-[240px] flex flex-col border-l border-l-transparent">
       <div className="flex items-start justify-between gap-3 mb-5">
         <div className="flex items-center gap-2 min-w-0">
           <div className="skeleton w-8 h-8 shrink-0" />
