@@ -108,7 +108,68 @@ interface BottomBarProps {
   allLanguages: string[];
   selectedLanguages: string[];
   toggleLanguage: (lang: string) => void;
+  sortBy: string;
+  setSortBy: (val: string) => void;
   clearFilters: () => void;
+}
+
+function SortDropdown({ current, onSelect }: { current: string, onSelect: (val: string) => void }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const options = [
+    { label: "RECENT", value: "RECENT" },
+    { label: "STARS", value: "STARS" },
+    { label: "ISSUES", value: "ISSUES" },
+    { label: "PR", value: "PR" },
+  ];
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const currentLabel = options.find(o => o.value === current)?.label || "RECENT";
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-widest text-neutral-400 transition-all hover:bg-neutral-800 hover:text-white"
+      >
+        <span className="text-neutral-500">SORT:</span>
+        <span>{currentLabel}</span>
+        <ChevronDown size={14} className={`transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
+      </button>
+
+      {isOpen && (
+        <div className="absolute bottom-full right-0 mb-3 w-48 rounded-2xl border border-neutral-700 bg-[#161616] shadow-[0_20px_50px_rgba(0,0,0,1)] z-50 overflow-hidden">
+          <div className="py-2 px-2">
+            {options.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => {
+                  onSelect(opt.value);
+                  setIsOpen(false);
+                }}
+                className={`flex items-center justify-between w-full px-3 py-2.5 text-[11px] font-semibold uppercase tracking-widest rounded-xl transition-all hover:bg-neutral-800 text-left ${
+                  current === opt.value ? "text-white bg-neutral-800" : "text-neutral-400 group-hover:text-neutral-300"
+                }`}
+              >
+                {opt.label}
+                {current === opt.value && <Check size={10} className="text-white" strokeWidth={3} />}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function BottomBar({
@@ -120,6 +181,8 @@ export function BottomBar({
   allLanguages,
   selectedLanguages,
   toggleLanguage,
+  sortBy,
+  setSortBy,
   clearFilters,
 }: BottomBarProps) {
   const hasActiveFilters = 
@@ -159,6 +222,11 @@ export function BottomBar({
             options={allLanguages}
             selected={selectedLanguages}
             onToggle={toggleLanguage}
+          />
+          <div className="h-6 w-px bg-neutral-700/50" />
+          <SortDropdown 
+            current={sortBy}
+            onSelect={setSortBy}
           />
         </div>
 

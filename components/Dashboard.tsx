@@ -16,6 +16,7 @@ export function Dashboard({ data }: DashboardProps) {
   const [search, setSearch] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>(["All"]);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(["All"]);
+  const [sortBy, setSortBy] = useState<string>("RECENT");
 
   const allCategories = useMemo(() => {
     const cats = new Set(data.projects.map((p) => p.category));
@@ -54,10 +55,20 @@ export function Dashboard({ data }: DashboardProps) {
       );
     }
 
-    return [...projects].sort((a, b) => 
-      new Date(b.pushedAt).getTime() - new Date(a.pushedAt).getTime()
-    );
-  }, [data.projects, search, selectedCategories, selectedLanguages]);
+    return [...projects].sort((a, b) => {
+      switch (sortBy) {
+        case "STARS":
+          return b.stars - a.stars;
+        case "ISSUES":
+          return b.openIssues - a.openIssues;
+        case "PR":
+          return b.pullRequests - a.pullRequests;
+        case "RECENT":
+        default:
+          return new Date(b.pushedAt).getTime() - new Date(a.pushedAt).getTime();
+      }
+    });
+  }, [data.projects, search, selectedCategories, selectedLanguages, sortBy]);
 
   const toggleCategory = (cat: string) => {
     if (cat === "All") {
@@ -103,7 +114,7 @@ export function Dashboard({ data }: DashboardProps) {
         <div className="max-w-8xl mx-auto">
           {filteredProjects.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
-              <AnimatePresence mode="wait">
+              <AnimatePresence>
                 {filteredProjects.map((project, i) => (
                   <motion.div
                     key={project.fullName}
@@ -139,6 +150,8 @@ export function Dashboard({ data }: DashboardProps) {
         allLanguages={allLanguages}
         selectedLanguages={selectedLanguages}
         toggleLanguage={toggleLanguage}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
         clearFilters={clearFilters}
       />
     </div>

@@ -78,6 +78,7 @@ interface RepoOwnerResponse {
         };
         isArchived: boolean;
         isFork: boolean;
+        parent: { nameWithOwner: string } | null;
         updatedAt: string;
         pushedAt: string;
         owner: { login: string; avatarUrl: string };
@@ -132,6 +133,9 @@ export async function fetchUserRepos(username: string): Promise<GitHubRepo[]> {
             }
             isArchived
             isFork
+            parent {
+              nameWithOwner
+            }
             updatedAt
             pushedAt
             owner {
@@ -162,9 +166,13 @@ export async function fetchUserRepos(username: string): Promise<GitHubRepo[]> {
     for (const repo of result.repositoryOwner.repositories.nodes) {
       if (repo.isArchived) continue;
 
+      // Use the parent repo name if it's a fork, to track the original project
+      const fullName = (repo.isFork && repo.parent) ? repo.parent.nameWithOwner : repo.nameWithOwner;
+      const [owner, name] = fullName.split("/");
+
       repos.push({
-        name: repo.name,
-        fullName: repo.nameWithOwner,
+        name: name,
+        fullName: fullName,
         description: repo.description,
         url: repo.url,
         homepage: repo.homepageUrl,
@@ -183,6 +191,7 @@ export async function fetchUserRepos(username: string): Promise<GitHubRepo[]> {
         pushedAt: repo.pushedAt,
         owner: { login: repo.owner.login, avatarUrl: repo.owner.avatarUrl },
         defaultBranch: repo.defaultBranchRef?.name ?? "main",
+        parentName: repo.parent?.nameWithOwner ?? null,
       });
     }
 
@@ -240,6 +249,9 @@ export async function fetchLiveRepoData(fullNames: string[]): Promise<Map<string
             }
             isArchived
             isFork
+            parent {
+              nameWithOwner
+            }
             updatedAt
             pushedAt
             owner {
@@ -280,6 +292,7 @@ export async function fetchLiveRepoData(fullNames: string[]): Promise<Map<string
             pushedAt: repo.pushedAt,
             owner: { login: repo.owner.login, avatarUrl: repo.owner.avatarUrl },
             defaultBranch: repo.defaultBranchRef?.name ?? "main",
+            parentName: repo.parent?.nameWithOwner ?? null,
           });
         }
       });

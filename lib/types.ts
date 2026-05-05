@@ -21,6 +21,7 @@ export interface GitHubRepo {
     avatarUrl: string;
   };
   defaultBranch: string;
+  parentName: string | null;
 }
 
 export interface AIAnalysis {
