@@ -3,7 +3,7 @@
 :root {
   --background: #050505;
   --foreground: #ededed;
-  --card-bg: rgba(255, 255, 255, 1);
+  --card-bg: rgba(255, 255, 255, 0.2);
   --card-border: rgba(255, 255, 255, 0.12);
   --card-hover: rgba(255, 255, 255, 0.14);
   --accent: #9945FF;
@@ -12,10 +12,12 @@
   --green-glow: rgba(20, 241, 149, 0.15);
   --muted: #888;
   --muted-2: #555;
+  --fd-card: 0 0% 9.8%;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-fd-card: var(--fd-card);
   --color-foreground: var(--foreground);
   --color-card-bg: var(--card-bg);
   --color-card-border: var(--card-border);
@@ -213,4 +215,10 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
+}
+
+
+.bg-fd-card {
+    --tw-bg-opacity: 1;
+    background-color: hsl(var(--fd-card) / var(--tw-bg-opacity, 1));
 }

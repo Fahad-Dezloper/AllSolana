@@ -30,7 +30,7 @@ export function ProjectCard({
       target="_blank"
       rel="noopener noreferrer"
       id={`project-${project.fullName.replace("/", "-")}`}
-      className="glass-card p-6 flex flex-col h-full group cursor-pointer border-l-4 border-l-transparent hover:border-l-accent transition-all duration-150"
+      className="bg-fd-card p-6 flex flex-col h-full group cursor-pointer border-l-4 border-l-transparent hover:border-l-accent transition-all duration-150"
     >
       <div className="flex items-start justify-between gap-3 mb-5">
         <div className="flex items-center gap-2 min-w-0">
@@ -78,14 +78,14 @@ export function ProjectCard({
             <GitFork size={12} className="text-muted-2" />
             <span className="font-mono text-[11px] text-white">{project.forks.toLocaleString()}</span>
           </div>
-          <div className="stat-pill">
+        </div>
+        <div className="stat-pill">
             <div className="w-1.5 h-1.5 bg-accent-secondary" />
             <span className="font-mono text-[11px] text-accent-secondary">{project.openIssues} ISSUES</span>
           </div>
-        </div>
-        <span className="text-[10px] text-muted-2 font-mono uppercase">
+        {/* <span className="text-[10px] text-muted-2 font-mono uppercase">
           {timeAgo(project.pushedAt)}
-        </span>
+        </span> */}
       </div>
     </a>
   );
