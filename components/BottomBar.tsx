@@ -28,10 +28,10 @@ function Dropdown({ label, options, selected, onToggle }: DropdownProps) {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 h-9 px-4 border border-white/10 hover:bg-white/5 text-[11px] uppercase tracking-wider font-bold transition-colors"
+        className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-widest text-neutral-400 transition-all hover:bg-neutral-800 hover:text-white"
       >
-        <span className="text-muted-2">{label}:</span>
-        <span className="text-white">
+        <span className="text-neutral-500">{label}:</span>
+        <span>
           {selected.length === 0 || selected.includes("All")
             ? "ALL"
             : selected.length === 1
@@ -42,29 +42,48 @@ function Dropdown({ label, options, selected, onToggle }: DropdownProps) {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-px w-64 bg-[#0a0a0a] border border-white/10 z-50">
-          <div className="max-h-64 overflow-y-auto py-1">
+        <div className="absolute bottom-full left-0 mb-3 w-64 rounded-2xl border border-neutral-700 bg-[#161616] shadow-[0_20px_50px_rgba(0,0,0,1)] z-50 overflow-hidden">
+          <div className="max-h-64 overflow-y-auto py-2 px-2">
             <button
               onClick={() => {
                 onToggle("All");
                 setIsOpen(false);
               }}
-              className="flex items-center justify-between w-full px-4 py-2 text-[11px] uppercase tracking-widest hover:bg-white/5 text-left"
+              className="group flex items-center justify-between w-full px-3 py-2.5 text-[11px] font-semibold uppercase tracking-widest rounded-xl transition-all hover:bg-neutral-800 text-left"
             >
-              <span>All</span>
-              {(selected.length === 0 || selected.includes("All")) && <Check size={12} className="text-accent" />}
+              <div className="flex items-center gap-3">
+                <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                  (selected.length === 0 || selected.includes("All")) 
+                    ? "bg-accent border-accent" 
+                    : "border-neutral-700 group-hover:border-neutral-500"
+                }`}>
+                  {(selected.length === 0 || selected.includes("All")) && <Check size={10} className="text-white" strokeWidth={3} />}
+                </div>
+                <span className={(selected.length === 0 || selected.includes("All")) ? "text-white" : "text-neutral-400 group-hover:text-neutral-300"}>All</span>
+              </div>
             </button>
-            <div className="h-px bg-white/5 my-1" />
-            {options.filter((o) => o !== "All").map((opt) => (
-              <button
-                key={opt}
-                onClick={() => onToggle(opt)}
-                className="flex items-center justify-between w-full px-4 py-2 text-[11px] uppercase tracking-widest hover:bg-white/5 text-left"
-              >
-                <span className={selected.includes(opt) ? "text-white" : "text-muted"}>{opt}</span>
-                {selected.includes(opt) && <Check size={12} className="text-accent" />}
-              </button>
-            ))}
+            <div className="h-px bg-neutral-800 my-1 mx-2" />
+            {options.filter((o) => o !== "All").map((opt) => {
+              const isSelected = selected.includes(opt);
+              return (
+                <button
+                  key={opt}
+                  onClick={() => onToggle(opt)}
+                  className="group flex items-center justify-between w-full px-3 py-2.5 text-[11px] font-semibold uppercase tracking-widest rounded-xl transition-all hover:bg-neutral-800 text-left"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                      isSelected 
+                        ? "bg-accent border-accent" 
+                        : "border-neutral-700 group-hover:border-neutral-500"
+                    }`}>
+                      {isSelected && <Check size={10} className="text-white" strokeWidth={3} />}
+                    </div>
+                    <span className={isSelected ? "text-white" : "text-neutral-400 group-hover:text-neutral-300"}>{opt}</span>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
@@ -101,42 +120,60 @@ export function BottomBar({
     search !== "";
 
   return (
-    <section className="fixed bottom-0 left-0 right-0 z-40 bg-[#0c0c0c]/95 backdrop-blur-xl border-t border-white/20 px-8 py-3 shadow-[0_-10px_50px_rgba(0,0,0,0.6)]">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-3 items-stretch">
-        <div className="relative flex-1">
-          <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-2" />
+    <section className="fixed bottom-6 left-0 right-0 z-40 px-4 flex justify-center">
+      <div className="flex items-center gap-1.5 rounded-full border border-neutral-700/50 bg-neutral-900/90 px-2 py-2 shadow-2xl shadow-black/50 backdrop-blur-xl sm:gap-2 sm:px-3">
+        
+        {/* Search Section */}
+        <div className="relative flex items-center">
+          <Search size={14} className="absolute left-3 text-neutral-500" />
           <input
             id="search-projects"
             type="text"
-            placeholder="SEARCH REPOSITORIES..."
+            placeholder="SEARCH..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="search-input !pl-11 !h-9 !text-[11px] !font-bold !tracking-wider uppercase !bg-white/5"
+            className="w-32 sm:w-48 bg-transparent pl-9 pr-3 py-1.5 text-[11px] font-bold tracking-wider uppercase text-white placeholder:text-neutral-600 focus:outline-none transition-all focus:w-40 sm:focus:w-64"
           />
         </div>
 
-        <div className="flex items-center gap-px">
+        <div className="h-6 w-px bg-neutral-700/50" />
+
+        {/* Filters Section */}
+        <div className="flex items-center gap-1">
           <Dropdown
-            label="CATEGORY"
+            label="CAT"
             options={allCategories}
             selected={selectedCategories}
             onToggle={toggleCategory}
           />
           <Dropdown
-            label="LANGUAGE"
+            label="LANG"
             options={allLanguages}
             selected={selectedLanguages}
             onToggle={toggleLanguage}
           />
+        </div>
+
+        <div className="h-6 w-px bg-neutral-700/50" />
+
+        {/* Actions Section */}
+        <div className="flex items-center gap-1">
+          <button className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-neutral-400 transition-all hover:bg-neutral-800 hover:text-white">
+            <span className="hidden sm:inline">Submit</span>
+            <span className="sm:hidden">+</span>
+          </button>
 
           {hasActiveFilters && (
-            <button
-              onClick={clearFilters}
-              className="h-9 px-4 border border-white/10 hover:bg-white/5 text-muted-2 hover:text-white transition-colors"
-              title="Clear Filters"
-            >
-              <X size={14} />
-            </button>
+            <>
+              <div className="h-6 w-px bg-neutral-700/50" />
+              <button
+                onClick={clearFilters}
+                className="flex items-center justify-center rounded-full p-1.5 text-neutral-500 transition-all hover:bg-neutral-800 hover:text-white"
+                title="Clear Filters"
+              >
+                <X size={14} />
+              </button>
+            </>
           )}
         </div>
       </div>

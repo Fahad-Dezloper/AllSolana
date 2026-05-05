@@ -131,13 +131,6 @@ export function Dashboard({ data }: DashboardProps) {
         toggleLanguage={toggleLanguage}
         clearFilters={clearFilters}
       />
-
-      <footer className="px-8 py-6 border-t border-white/10 text-[9px] text-muted-2 font-mono uppercase tracking-[0.3em] mb-20">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <p>SYSTEM STATUS: READY // REPOS: {data.totalReposScanned}</p>
-          <span>GEMINI ANALYSIS ACTIVE</span>
-        </div>
-      </footer>
     </div>
   );
 }

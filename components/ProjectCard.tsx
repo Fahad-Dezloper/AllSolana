@@ -37,7 +37,7 @@ export function ProjectCard({
           <img
             src={project.owner.avatarUrl}
             alt={project.owner.login}
-            className="w-8 h-8 ring-1 ring-white/10 shrink-0"
+            className="w-8 h-8  shrink-0"
             // w-6 h-6 ring-1 ring-white/5 grayscale group-hover:grayscale-0 transition-all shrink-0
           />
           <div className="min-w-0">
