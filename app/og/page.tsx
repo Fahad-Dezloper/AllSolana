@@ -42,9 +42,9 @@ const OGPage = () => {
       {/* Brutalist Border */}
       <div className="absolute inset-0 border-[24px] border-white/5 pointer-events-none" />
       <div className="absolute bottom-12 right-12">
-        <div className="px-6 py-3 bg-[#14F195] text-black text-xl font-black uppercase tracking-tighter transform rotate-[-2deg]">
-          contribute.superteam
-        </div>
+        {/* <div className="px-6 py-3 bg-[#14F195] text-black text-xl font-black uppercase tracking-tighter transform rotate-[-2deg]">
+            contribute-solana.vercel.app
+        </div> */}
       </div>
     </div>
   )

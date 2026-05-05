@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://contribute-solana.vercel.app/"),
   title: "Solana Contribute — The Superteam Open Source Index",
   description: "High-density index of active repositories on Solana",
   keywords: [
@@ -35,7 +36,7 @@ export const metadata: Metadata = {
     siteName: "Superteam Contribute",
     images: [
       {
-        url: "/OG/OG.png",
+        url: "/OG/OG2.png",
         width: 2308,
         height: 1162,
         alt: "Solana Contribute Dashboard",
@@ -46,7 +47,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Solana Contribute — The Superteam Open Source Index",
     description: "High-density index of active repositories on Solana",
-    images: ["/OG/OG.png"],
+    images: ["/OG/OG2.png"],
   },
   robots: {
     index: true,
@@ -72,11 +73,11 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "WebSite",
               "name": "Solana Contribute",
-              "url": "https://contribute.superteam",
+              "url": "https://contribute-solana.vercel.app/",
               "description": "Discover high-impact open-source projects on Solana.",
               "potentialAction": {
                 "@type": "SearchAction",
-                "target": "https://contribute.superteam/?search={search_term_string}",
+                "target": "https://contribute-solana.vercel.app/?search={search_term_string}",
                 "query-input": "required name=search_term_string"
               }
             }),

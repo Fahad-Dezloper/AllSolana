@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: '/private/',
     },
-    sitemap: 'https://contribute.superteam/sitemap.xml',
+    sitemap: 'https://contribute-solana.vercel.app/sitemap.xml',
   }
 }
