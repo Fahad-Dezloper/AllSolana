@@ -30,7 +30,7 @@ export function ProjectCard({
       target="_blank"
       rel="noopener noreferrer"
       id={`project-${project.fullName.replace("/", "-")}`}
-      className="bg-fd-card p-6 flex flex-col h-full group cursor-pointer border-l border-l-transparent hover:border-l-solana-green transition-all duration-150"
+      className="bg-fd-card p-6 flex flex-col h-full min-h-[240px] group cursor-pointer border-l border-l-transparent hover:border-l-solana-green transition-all duration-150"
     >
       <div className="flex items-start justify-between gap-3 mb-5">
         <div className="flex items-center gap-2 min-w-0">
@@ -53,9 +53,11 @@ export function ProjectCard({
         />
       </div>
 
-      <p className="text-[13px] text-[#aaa] leading-relaxed mb-6 line-clamp-2 font-light flex-grow">
-        {project.summary || project.description || "No description available."}
-      </p>
+      <div className="h-10 mb-6 flex-grow">
+        <p className="text-[13px] text-[#aaa] leading-relaxed line-clamp-2 font-light">
+          {project.summary || project.description || "No description available."}
+        </p>
+      </div>
 
       <div className="flex flex-wrap gap-1.5 mb-6">
         <span className="badge badge-accent text-[10px]">
@@ -93,7 +95,7 @@ export function ProjectCard({
 
 export function ProjectCardSkeleton() {
   return (
-    <div className="bg-fd-card p-6 h-full flex flex-col border-l border-l-transparent">
+    <div className="bg-fd-card p-6 h-full min-h-[240px] flex flex-col border-l border-l-transparent">
       <div className="flex items-start justify-between gap-3 mb-5">
         <div className="flex items-center gap-2 min-w-0">
           <div className="skeleton w-8 h-8 shrink-0" />
@@ -105,7 +107,7 @@ export function ProjectCardSkeleton() {
         <div className="skeleton w-3.5 h-3.5 shrink-0" />
       </div>
 
-      <div className="space-y-2 mb-6 flex-grow">
+      <div className="space-y-2 mb-6 h-10 flex-grow">
         <div className="skeleton h-3.5 w-full" />
         <div className="skeleton h-3.5 w-4/5" />
       </div>

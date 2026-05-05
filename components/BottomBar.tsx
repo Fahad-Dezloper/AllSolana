@@ -12,7 +12,15 @@ interface DropdownProps {
 
 function Dropdown({ label, options, selected, onToggle }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [displaySelected, setDisplaySelected] = useState(selected);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Update display label only when dropdown closes to prevent layout shift while selecting
+  useEffect(() => {
+    if (!isOpen) {
+      setDisplaySelected(selected);
+    }
+  }, [isOpen, selected]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -31,14 +39,14 @@ function Dropdown({ label, options, selected, onToggle }: DropdownProps) {
         className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-widest text-neutral-400 transition-all hover:bg-neutral-800 hover:text-white"
       >
         <span className="text-neutral-500">{label}:</span>
-        <span>
-          {selected.length === 0 || selected.includes("All")
+        <span className="transition-all duration-300">
+          {displaySelected.length === 0 || displaySelected.includes("All")
             ? "ALL"
-            : selected.length === 1
-            ? selected[0].toUpperCase()
-            : `${selected.length} SELECTED`}
+            : displaySelected.length === 1
+            ? displaySelected[0].toUpperCase()
+            : `${displaySelected.length} SELECTED`}
         </span>
-        <ChevronDown size={14} className={`transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown size={14} className={`transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
       </button>
 
       {isOpen && (
