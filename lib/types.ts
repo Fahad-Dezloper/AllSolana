@@ -9,6 +9,7 @@ export interface GitHubRepo {
   stars: number;
   forks: number;
   openIssues: number;
+  pullRequests: number;
   languages: { name: string; size: number }[];
   topics: string[];
   isArchived: boolean;
@@ -40,6 +41,7 @@ export interface SolanaProject {
   stars: number;
   forks: number;
   openIssues: number;
+  pullRequests: number;
   languages: { name: string; size: number }[];
   topics: string[];
   updatedAt: string;

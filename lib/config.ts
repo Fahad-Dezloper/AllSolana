@@ -101,10 +101,9 @@ export const PROJECT_CATEGORIES = [
   "Governance / DAO",
   "Data / Analytics",
   "Mobile",
-  "Other",
 ] as const;
 
-export type ProjectCategory = (typeof PROJECT_CATEGORIES)[number];
+export type ProjectCategory = string;
 
 export const DIFFICULTY_LEVELS = [
   "Beginner",

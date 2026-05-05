@@ -30,7 +30,7 @@ export async function getSolanaProjects(): Promise<ProjectsResponse> {
       const map = await fetchLiveRepoData(names);
       return Array.from(map.entries()); // Serializable for cache
     },
-    ["github-live-data"],
+    ["github-live-data-v2"],
     { revalidate: 3600, tags: ["projects"] }
   );
 
@@ -50,6 +50,7 @@ export async function getSolanaProjects(): Promise<ProjectsResponse> {
           stars: 0,
           forks: 0,
           openIssues: 0,
+          pullRequests: 0,
           languages: [],
           topics: [],
           updatedAt: p.lastScannedAt.toISOString(),
@@ -80,6 +81,7 @@ export async function getSolanaProjects(): Promise<ProjectsResponse> {
         stars: live.stars,
         forks: live.forks,
         openIssues: live.openIssues,
+        pullRequests: live.pullRequests,
         languages: live.languages,
         topics: live.topics,
         updatedAt: live.updatedAt,

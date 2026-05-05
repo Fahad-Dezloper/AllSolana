@@ -12,7 +12,7 @@ let aiDisabled = false;
 const analysisSchema = z.object({
   isSolanaRelated: z.boolean(),
   confidence: z.number().min(0).max(100),
-  category: z.enum(PROJECT_CATEGORIES),
+  category: z.string(),
   summary: z.string().max(200),
   difficulty: z.enum(DIFFICULTY_LEVELS),
   keyFeatures: z.array(z.string()).max(5),
@@ -47,7 +47,8 @@ ${heuristicSignals.map((s) => `- ${s}`).join("\n")}
    - **Governance / DAO**: Voting systems, multisigs (Squads), governance frameworks (Realms).
    - **Data / Analytics**: Block explorers, on-chain data dashboards, analytics tools.
    - **Mobile**: Solana Mobile Stack, SMS-related tools, mobile apps.
-   - **Other**: Anything that doesn't fit the above but IS Solana-related.
+    
+    If the project does NOT fit any of these categories, propose a new, concise category name (1-3 words max) that accurately describes it. Be specific but keep it brief.
 
 4. Write a punchy, developer-friendly summary (not generic — make it specific to what this project does).
 5. Estimate contribution difficulty based on the language, project size, and complexity.
@@ -64,7 +65,7 @@ export function buildFallbackAnalysis(
   heuristicSignals: string[]
 ): AIAnalysis {
   const text = `${repo.name} ${repo.description ?? ""} ${repo.topics.join(" ")}`.toLowerCase();
-  let category: AIAnalysis["category"] = "Other";
+  let category: AIAnalysis["category"] = "Developer Tools";
   if (text.includes("defi") || text.includes("swap") || text.includes("amm") || text.includes("lending")) category = "DeFi";
   else if (text.includes("nft") || text.includes("metaplex") || text.includes("token")) category = "NFT / Digital Assets";
   else if (text.includes("sdk") || text.includes("lib") || text.includes("client")) category = "SDK / Library";

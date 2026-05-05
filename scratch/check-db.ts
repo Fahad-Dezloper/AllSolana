@@ -1,11 +1,13 @@
-import "dotenv/config";
 import { prisma } from "../lib/db";
 
 async function main() {
-  const projects = await prisma.project.findMany({
-   select: { fullName: true, ownerLogin: true, category: true }
-    });
-  console.log(projects);
+  const count = await prisma.project.count();
+  console.log(`Total projects in DB: ${count}`);
+  const categories = await prisma.project.groupBy({
+    by: ["category"],
+    _count: true,
+  });
+  console.log("Categories distribution:", JSON.stringify(categories, null, 2));
 }
 
-main();
+main().catch(console.error);

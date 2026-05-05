@@ -1,6 +1,6 @@
 "use client";
 
-import { Star, GitFork, ArrowUpRight } from "lucide-react";
+import { Star, GitPullRequest, ArrowUpRight } from "lucide-react";
 import type { SolanaProject } from "@/lib/types";
 
 function timeAgo(dateStr: string): string {
@@ -72,11 +72,11 @@ export function ProjectCard({
         <div className="flex items-center gap-4">
           <div className="stat-pill">
             <Star size={12} className="text-muted-2" />
-            <span className="font-mono text-[11px] text-white">{project.stars.toLocaleString()}</span>
+            <span className="font-mono text-[11px] text-white">{(project.stars || 0).toLocaleString()}</span>
           </div>
           <div className="stat-pill">
-            <GitFork size={12} className="text-muted-2" />
-            <span className="font-mono text-[11px] text-white">{project.forks.toLocaleString()}</span>
+            <GitPullRequest size={12} className="text-muted-2" />
+            <span className="font-mono text-[11px] text-white">{(project.pullRequests || 0).toLocaleString()}</span>
           </div>
         </div>
         <div className="stat-pill">

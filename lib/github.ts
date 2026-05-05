@@ -72,6 +72,7 @@ interface RepoOwnerResponse {
           edges: Array<{ size: number; node: { name: string } }>;
         };
         issues?: { totalCount: number } | null;
+        pullRequests?: { totalCount: number } | null;
         repositoryTopics: {
           nodes: Array<{ topic: { name: string } }>;
         };
@@ -117,6 +118,9 @@ export async function fetchUserRepos(username: string): Promise<GitHubRepo[]> {
               }
             }
             issues(states: OPEN) {
+              totalCount
+            }
+            pullRequests(states: OPEN) {
               totalCount
             }
             repositoryTopics(first: 10) {
@@ -167,6 +171,7 @@ export async function fetchUserRepos(username: string): Promise<GitHubRepo[]> {
         stars: repo.stargazerCount,
         forks: repo.forkCount,
         openIssues: repo.issues?.totalCount ?? 0,
+        pullRequests: repo.pullRequests?.totalCount ?? 0,
         languages: repo.languages.edges.map((e) => ({
           name: e.node.name,
           size: e.size,
@@ -223,6 +228,9 @@ export async function fetchLiveRepoData(fullNames: string[]): Promise<Map<string
             issues(states: OPEN) {
               totalCount
             }
+            pullRequests(states: OPEN) {
+              totalCount
+            }
             repositoryTopics(first: 10) {
               nodes {
                 topic {
@@ -260,6 +268,7 @@ export async function fetchLiveRepoData(fullNames: string[]): Promise<Map<string
             stars: repo.stargazerCount,
             forks: repo.forkCount,
             openIssues: repo.issues?.totalCount ?? 0,
+            pullRequests: repo.pullRequests?.totalCount ?? 0,
             languages: repo.languages.edges.map((e: any) => ({
               name: e.node.name,
               size: e.size,
