@@ -15,7 +15,6 @@ function Dropdown({ label, options, selected, onToggle }: DropdownProps) {
   const [displaySelected, setDisplaySelected] = useState(selected);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Update display label only when dropdown closes to prevent layout shift while selecting
   useEffect(() => {
     if (!isOpen) {
       setDisplaySelected(selected);
@@ -234,10 +233,10 @@ export function BottomBar({
 
         {/* Actions Section */}
         <div className="flex items-center gap-1">
-          <button className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-neutral-400 transition-all hover:bg-neutral-800 hover:text-white">
+          {/* <button className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-neutral-400 transition-all hover:bg-neutral-800 hover:text-white">
             <span className="hidden sm:inline">Submit</span>
             <span className="sm:hidden">+</span>
-          </button>
+          </button> */}
 
           {hasActiveFilters && (
             <>
