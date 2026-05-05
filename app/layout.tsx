@@ -36,8 +36,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: "/OG/OG.png",
-        width: 1200,
-        height: 630,
+        width: 2308,
+        height: 1162,
         alt: "Solana Contribute Dashboard",
       },
     ],
