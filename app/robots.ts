@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: '/private/',
     },
-    sitemap: 'https://contribute.solana.com/sitemap.xml', // Replace with actual domain
+    sitemap: 'https://contribute.superteam/sitemap.xml',
   }
 }

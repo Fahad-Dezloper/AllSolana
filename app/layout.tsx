@@ -13,9 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Solana Contribute — The Ecosystem Open Source Index",
-  description:
-    "Discover high-impact open-source projects on Solana. We track top ecosystem developers' GitHub activity to find the best repositories for you to contribute to.",
+  title: "Solana Contribute — The Superteam Open Source Index",
+  description: "High-density index of active repositories on Solana",
   keywords: [
     "Solana",
     "Open Source",
@@ -27,16 +26,16 @@ export const metadata: Metadata = {
     "Superteam",
     "Solana Foundation",
   ],
-  authors: [{ name: "Solana Ecosystem" }],
+  authors: [{ name: "Superteam" }],
   openGraph: {
-    title: "Solana Contribute — The Ecosystem Open Source Index",
-    description: "Discover high-impact open-source projects on Solana. Tracked via AI-analyzed GitHub activity.",
+    title: "Solana Contribute — The Superteam Open Source Index",
+    description: "High-density index of active repositories on Solana",
     type: "website",
     locale: "en_US",
-    siteName: "Solana Contribute",
+    siteName: "Superteam Contribute",
     images: [
       {
-        url: "/og-image.png", // Note: User needs to provide this or I can generate a placeholder
+        url: "/OG/OG.png",
         width: 1200,
         height: 630,
         alt: "Solana Contribute Dashboard",
@@ -45,9 +44,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Solana Contribute — The Ecosystem Open Source Index",
-    description: "Find your next contribution on Solana. AI-powered repository tracking.",
-    images: ["/og-image.png"],
+    title: "Solana Contribute — The Superteam Open Source Index",
+    description: "High-density index of active repositories on Solana",
+    images: ["/OG/OG.png"],
   },
   robots: {
     index: true,
@@ -73,11 +72,11 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "WebSite",
               "name": "Solana Contribute",
-              "url": "https://contribute.solana.com",
+              "url": "https://contribute.superteam",
               "description": "Discover high-impact open-source projects on Solana.",
               "potentialAction": {
                 "@type": "SearchAction",
-                "target": "https://contribute.solana.com/?search={search_term_string}",
+                "target": "https://contribute.superteam/?search={search_term_string}",
                 "query-input": "required name=search_term_string"
               }
             }),
