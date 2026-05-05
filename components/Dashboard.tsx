@@ -4,6 +4,7 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { Search, ChevronDown, Check, X, Filter } from "lucide-react";
 import type { SolanaProject, ProjectsResponse } from "@/lib/types";
 import { ProjectCard } from "@/components/ProjectCard";
+import Image from "next/image";
 
 interface DashboardProps {
   data: ProjectsResponse;
@@ -37,7 +38,7 @@ function Dropdown({
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 h-10 px-4 border border-white/10 hover:bg-white/5 text-[11px] uppercase tracking-wider font-bold transition-colors"
+        className="flex items-center gap-2 h-9 px-4 border border-white/10 hover:bg-white/5 text-[11px] uppercase tracking-wider font-bold transition-colors"
       >
         <span className="text-muted-2">{label}:</span>
         <span className="text-white">
@@ -123,7 +124,9 @@ export function Dashboard({ data }: DashboardProps) {
       );
     }
 
-    return projects;
+    return [...projects].sort((a, b) => 
+      new Date(b.pushedAt).getTime() - new Date(a.pushedAt).getTime()
+    );
   }, [data.projects, search, selectedCategories, selectedLanguages]);
 
   const toggleCategory = (cat: string) => {
@@ -162,13 +165,15 @@ export function Dashboard({ data }: DashboardProps) {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex flex-col">
             <div className="flex items-center gap-2 mb-0.5">
-              <div className="w-1.5 h-1.5 bg-accent" />
+              <div className="w-5 h-4">
+              <Image src={"/logo/solanaLogoMark.svg"} width={200} height={200} className="w-full h-full object-cover" alt="Solana Logoo" />
+              </div>
               <h1 className="text-lg font-bold text-white tracking-tighter uppercase">
-                SOLANA <span className="text-muted">CONTRIBUTE</span>
+                CONTRIBUTE
               </h1>
             </div>
             <p className="text-[11px] text-muted-2 uppercase tracking-tight font-medium">
-              High-density index of active repositories // sync from {data.totalTrackedUsers} leads
+              High-density index of active repositories on Solana
             </p>
           </div>
 
@@ -176,12 +181,6 @@ export function Dashboard({ data }: DashboardProps) {
             <div className="flex flex-col justify-center">
               <span className="text-[9px] text-muted-2 uppercase font-bold tracking-widest leading-none mb-1">Index Size</span>
               <span className="text-lg font-bold font-mono text-white leading-none">{data.projects.length}</span>
-            </div>
-            <div className="flex flex-col justify-center">
-              <span className="text-[9px] text-muted-2 uppercase font-bold tracking-widest leading-none mb-1">Last Sync</span>
-              <span className="text-lg font-bold font-mono text-white leading-none">
-                {new Date(data.lastUpdated).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-              </span>
             </div>
           </div>
         </div>
@@ -209,11 +208,11 @@ export function Dashboard({ data }: DashboardProps) {
         </div>
       </main>
 
-      <section className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-md border-t border-white/10 px-8 py-4">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 items-stretch">
+      <section className="fixed bottom-0 left-0 right-0 z-40 bg-[#0c0c0c]/95 backdrop-blur-xl border-t border-white/20 px-8 py-3 shadow-[0_-10px_50px_rgba(0,0,0,0.6)]">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-3 items-stretch">
           <div className="relative flex-1">
             <Search
-              size={16}
+              size={14}
               className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-2"
             />
             <input
@@ -222,7 +221,7 @@ export function Dashboard({ data }: DashboardProps) {
               placeholder="SEARCH REPOSITORIES..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="search-input !pl-12 !h-10 !text-[12px] !font-bold !tracking-wider uppercase !bg-white/5"
+              className="search-input !pl-11 !h-9 !text-[11px] !font-bold !tracking-wider uppercase !bg-white/5"
             />
           </div>
 
@@ -247,10 +246,10 @@ export function Dashboard({ data }: DashboardProps) {
                   setSelectedCategories(["All"]);
                   setSelectedLanguages(["All"]);
                 }}
-                className="h-10 px-4 border border-white/10 hover:bg-white/5 text-muted-2 hover:text-white"
+                className="h-9 px-4 border border-white/10 hover:bg-white/5 text-muted-2 hover:text-white transition-colors"
                 title="Clear Filters"
               >
-                <X size={16} />
+                <X size={14} />
               </button>
             )}
           </div>
