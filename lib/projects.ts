@@ -5,6 +5,8 @@ import { filterPotentialSolanaRepos } from "./solana-detector";
 import { batchAnalyzeWithAI } from "./ai-analyst";
 import type { SolanaProject, ProjectsResponse, GitHubRepo } from "./types";
 
+import { unstable_cache } from "next/cache";
+
 const STALE_THRESHOLD_MS = 24 * 60 * 60 * 1000;
 
 let pipelineRunning = false;
@@ -19,13 +21,55 @@ export async function getSolanaProjects(): Promise<ProjectsResponse> {
     },
   });
 
-  const fullNames = dbProjects.map(p => p.fullName);
-  const liveDataMap = await fetchLiveRepoData(fullNames);
+  const fullNames = dbProjects.map(p => p.fullName).sort();
+  
+  // Best practice: Use unstable_cache for persistent server-side caching
+  const getCachedLiveData = unstable_cache(
+    async (names: string[]) => {
+      console.log("[Projects] Fetching fresh live data from GitHub...");
+      const map = await fetchLiveRepoData(names);
+      return Array.from(map.entries()); // Serializable for cache
+    },
+    ["github-live-data"],
+    { revalidate: 3600, tags: ["projects"] }
+  );
+
+  const liveDataEntries = await getCachedLiveData(fullNames);
+  const liveDataMap = new Map<string, GitHubRepo>(liveDataEntries);
 
   const mergedProjects: SolanaProject[] = dbProjects
     .map((p) => {
       const live = liveDataMap.get(p.fullName);
-      if (!live) return null;
+      if (!live) {
+        return {
+          name: p.fullName.split("/")[1],
+          fullName: p.fullName,
+          description: p.summary,
+          url: `https://github.com/${p.fullName}`,
+          homepage: null,
+          stars: 0,
+          forks: 0,
+          openIssues: 0,
+          languages: [],
+          topics: [],
+          updatedAt: p.lastScannedAt.toISOString(),
+          pushedAt: p.lastScannedAt.toISOString(),
+          owner: {
+            login: p.ownerLogin,
+            avatarUrl: `https://github.com/${p.ownerLogin}.png`,
+          },
+          category: p.category as SolanaProject["category"],
+          summary: p.summary,
+          difficulty: p.difficulty as SolanaProject["difficulty"],
+          keyFeatures: p.keyFeatures,
+          confidence: p.confidence,
+          trackedContributors: p.contributors.map((c) => ({
+            github: c.user.github,
+            name: c.user.name,
+            role: c.user.role,
+          })),
+        };
+      };
 
       return {
         name: live.name,
@@ -44,13 +88,11 @@ export async function getSolanaProjects(): Promise<ProjectsResponse> {
           login: live.owner.login,
           avatarUrl: live.owner.avatarUrl,
         },
-
         category: p.category as SolanaProject["category"],
         summary: p.summary,
         difficulty: p.difficulty as SolanaProject["difficulty"],
         keyFeatures: p.keyFeatures,
         confidence: p.confidence,
-
         trackedContributors: p.contributors.map((c) => ({
           github: c.user.github,
           name: c.user.name,

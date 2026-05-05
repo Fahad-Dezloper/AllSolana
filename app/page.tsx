@@ -8,43 +8,39 @@ import { TRACKED_USERS } from "@/lib/config";
 
 function DashboardSkeleton() {
   return (
-    <div className="flex-1 flex flex-col">
-      <header className="pt-16 pb-10 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="skeleton h-4 w-36 mb-4 rounded-full" />
-          <div className="skeleton h-12 w-80 mb-3" />
-          <div className="skeleton h-12 w-96 mb-4" />
-          <div className="skeleton h-5 w-[500px] mb-2" />
-          <div className="skeleton h-5 w-[400px] mb-8" />
-          <div className="flex gap-6">
-            <div className="skeleton h-5 w-28" />
-            <div className="skeleton h-5 w-36" />
-            <div className="skeleton h-5 w-32" />
+    <div className="flex-1 flex flex-col font-sans min-h-screen">
+      {/* TopBar Skeleton */}
+      <header className="sticky top-0 z-30 bg-background border-b border-white/10 px-8 py-2">
+        <div className="max-w-8xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4 h-10">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2 mb-0.5">
+              <div className="skeleton w-5 h-4" />
+              <div className="skeleton h-5 w-24" />
+            </div>
+          </div>
+          <div className="flex items-center gap-8 border-l border-white/10 pl-8 h-10">
+            <div className="skeleton h-8 w-16" />
           </div>
         </div>
       </header>
 
-      <section className="px-6 pb-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="skeleton h-12 w-full mb-4 rounded-xl" />
-          <div className="flex gap-2">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="skeleton h-9 w-20 rounded-full" />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <main className="flex-1 px-6 py-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="skeleton h-4 w-32 mb-6" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array.from({ length: 9 }).map((_, i) => (
+      {/* Main Content Skeleton */}
+      <main className="flex-1 px-8 py-6 pb-32">
+        <div className="max-w-8xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+            {Array.from({ length: 8 }).map((_, i) => (
               <ProjectCardSkeleton key={i} />
             ))}
           </div>
         </div>
       </main>
+
+      {/* BottomBar Skeleton */}
+      <section className="fixed bottom-6 left-0 right-0 z-40 px-4 flex justify-center">
+        <div className="flex items-center gap-1.5 rounded-full border border-neutral-700/50 bg-neutral-900/90 px-2 py-2 shadow-2xl shadow-black/50 backdrop-blur-xl sm:gap-2 sm:px-3 w-full max-w-lg">
+          <div className="skeleton h-8 w-full rounded-full" />
+        </div>
+      </section>
     </div>
   );
 }

@@ -101,7 +101,7 @@ export function Dashboard({ data }: DashboardProps) {
       <main className="flex-1 px-8 py-6 pb-32">
         <div className="max-w-8xl mx-auto">
           {filteredProjects.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
               {filteredProjects.map((project, i) => (
                 <ProjectCard
                   key={project.fullName}

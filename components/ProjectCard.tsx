@@ -30,7 +30,7 @@ export function ProjectCard({
       target="_blank"
       rel="noopener noreferrer"
       id={`project-${project.fullName.replace("/", "-")}`}
-      className="bg-fd-card p-6 flex flex-col h-full group cursor-pointer border-l border-l-transparent hover:border-l-accent transition-all duration-150"
+      className="bg-fd-card p-6 flex flex-col h-full group cursor-pointer border-l border-l-transparent hover:border-l-solana-green transition-all duration-150"
     >
       <div className="flex items-start justify-between gap-3 mb-5">
         <div className="flex items-center gap-2 min-w-0">
@@ -41,7 +41,7 @@ export function ProjectCard({
             // w-6 h-6 ring-1 ring-white/5 grayscale group-hover:grayscale-0 transition-all shrink-0
           />
           <div className="min-w-0">
-            <h3 className="text-[14px] font-bold text-white truncate uppercase tracking-wider group-hover:text-accent transition-colors">
+            <h3 className="text-[14px] font-bold text-white truncate uppercase tracking-wider group-hover:text-solana-green transition-colors">
               {project.name}
             </h3>
             <p className="text-[11px] text-muted truncate font-mono uppercase">{project.owner.login}</p>
@@ -49,7 +49,7 @@ export function ProjectCard({
         </div>
         <ArrowUpRight
           size={14}
-          className="text-muted-2 group-hover:text-accent transition-colors shrink-0"
+          className="text-muted-2 group-hover:text-solana-green transition-colors shrink-0"
         />
       </div>
 
@@ -93,17 +93,29 @@ export function ProjectCard({
 
 export function ProjectCardSkeleton() {
   return (
-    <div className="glass-card p-6 h-full flex flex-col">
-      <div className="flex items-center gap-3 mb-5">
-        <div className="skeleton w-8 h-8" />
-        <div className="flex-1">
-          <div className="skeleton h-4 w-32 mb-1.5" />
-          <div className="skeleton h-3 w-20" />
+    <div className="bg-fd-card p-6 h-full flex flex-col border-l border-l-transparent">
+      <div className="flex items-start justify-between gap-3 mb-5">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="skeleton w-8 h-8 shrink-0" />
+          <div className="min-w-0">
+            <div className="skeleton h-4 w-24 mb-1.5" />
+            <div className="skeleton h-3 w-16" />
+          </div>
         </div>
+        <div className="skeleton w-3.5 h-3.5 shrink-0" />
       </div>
-      <div className="skeleton h-3 w-full mb-2" />
-      <div className="skeleton h-3 w-3/4 mb-4" />
-      <div className="mt-auto pt-4 border-t border-white/5 flex justify-between">
+
+      <div className="space-y-2 mb-6 flex-grow">
+        <div className="skeleton h-3.5 w-full" />
+        <div className="skeleton h-3.5 w-4/5" />
+      </div>
+
+      <div className="flex gap-1.5 mb-6">
+        <div className="skeleton h-5 w-16" />
+        <div className="skeleton h-5 w-14" />
+      </div>
+
+      <div className="flex items-center justify-between pt-4 border-t border-white/5 mt-auto">
         <div className="flex gap-4">
           <div className="skeleton h-3 w-10" />
           <div className="skeleton h-3 w-10" />

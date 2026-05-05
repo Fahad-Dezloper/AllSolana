@@ -192,10 +192,14 @@ export async function fetchLiveRepoData(fullNames: string[]): Promise<Map<string
   const result = new Map<string, GitHubRepo>();
   if (fullNames.length === 0) return result;
 
-  const chunkSize = 20;
+  const chunkSize = 30;
+  const chunks: string[][] = [];
   for (let i = 0; i < fullNames.length; i += chunkSize) {
-    const chunk = fullNames.slice(i, i + chunkSize);
-    
+    chunks.push(fullNames.slice(i, i + chunkSize));
+  }
+
+  const results = await Promise.all(chunks.map(async (chunk) => {
+    const chunkMap = new Map<string, GitHubRepo>();
     const query = `
       query {
         ${chunk.map((name, idx) => {
@@ -247,7 +251,7 @@ export async function fetchLiveRepoData(fullNames: string[]): Promise<Map<string
       chunk.forEach((name, idx) => {
         const repo = data[`repo_${idx}`];
         if (repo) {
-          result.set(name, {
+          chunkMap.set(name, {
             name: repo.name,
             fullName: repo.nameWithOwner,
             description: repo.description,
@@ -271,9 +275,14 @@ export async function fetchLiveRepoData(fullNames: string[]): Promise<Map<string
         }
       });
     } catch (err) {
-      console.error(`[GitHub] Batch fetch failed:`, (err as Error).message);
+      console.error(`[GitHub] Chunk fetch failed:`, (err as Error).message);
     }
-  }
+    return chunkMap;
+  }));
+
+  results.forEach(map => {
+    map.forEach((val, key) => result.set(key, val));
+  });
 
   return result;
 }

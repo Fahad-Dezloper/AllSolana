@@ -16,8 +16,8 @@ export function TopBar({ projectsCount }: TopBarProps) {
               <Image 
                 src="/logo/solanaLogoMark.svg" 
                 width={20} 
-                height={20} 
-                className="w-full h-full object-cover" 
+                height={16} 
+                className="w-full h-full object-contain" 
                 alt="Solana Logo" 
               />
             </div>
