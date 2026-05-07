@@ -7,25 +7,21 @@ datasource db {
 }
 
 model Project {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  fullName    String  @unique 
-  ownerLogin  String
-
-  isSolanaRelated   Boolean @default(true)
-  confidence        Int     @default(60) 
-  category          String  @default("Other")
-  summary           String  @default("")
-  difficulty        String  @default("Intermediate")
-  keyFeatures       String[] 
-  analysisSource    String   @default("heuristic") 
-
-  contributors ProjectContributor[]
-
-  lastScannedAt DateTime @default(now()) 
-  heuristicScore Int     @default(0)     
+  id              String               @id @default(cuid())
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  fullName        String               @unique
+  ownerLogin      String
+  isSolanaRelated Boolean              @default(true)
+  confidence      Int                  @default(60)
+  category        String               @default("Other")
+  summary         String               @default("")
+  difficulty      String               @default("Intermediate")
+  keyFeatures     String[]
+  analysisSource  String               @default("heuristic")
+  lastScannedAt   DateTime             @default(now())
+  heuristicScore  Int                  @default(0)
+  contributors    ProjectContributor[]
 
   @@index([category])
   @@index([difficulty])
@@ -34,29 +30,24 @@ model Project {
 }
 
 model TrackedUser {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  github    String @unique 
-  name      String
-  role      String @default("Contributor")
-
-  reposFetched Int @default(0)
+  id            String               @id @default(cuid())
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  github        String               @unique
+  name          String
+  role          String               @default("Contributor")
+  reposFetched  Int                  @default(0)
   lastFetchedAt DateTime?
-
   contributions ProjectContributor[]
 }
 
 model ProjectContributor {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-
-  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  id        String      @id @default(cuid())
+  createdAt DateTime    @default(now())
   projectId String
-
-  user      TrackedUser @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
+  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      TrackedUser @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, userId])
   @@index([projectId])
@@ -64,15 +55,14 @@ model ProjectContributor {
 }
 
 model PipelineRun {
-  id        String   @id @default(cuid())
-  startedAt DateTime @default(now())
-  finishedAt DateTime?
-
-  status          String @default("running") 
-  totalReposScanned Int   @default(0)
-  totalProjectsFound Int  @default(0)
-  aiAnalysesUsed   Int    @default(0)
-  fallbacksUsed    Int    @default(0)
-  durationMs       Int?
-  error            String?
+  id                 String    @id @default(cuid())
+  startedAt          DateTime  @default(now())
+  finishedAt         DateTime?
+  status             String    @default("running")
+  totalReposScanned  Int       @default(0)
+  totalProjectsFound Int       @default(0)
+  aiAnalysesUsed     Int       @default(0)
+  fallbacksUsed      Int       @default(0)
+  durationMs         Int?
+  error              String?
 }

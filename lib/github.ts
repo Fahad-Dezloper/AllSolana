@@ -166,7 +166,6 @@ export async function fetchUserRepos(username: string): Promise<GitHubRepo[]> {
     for (const repo of result.repositoryOwner.repositories.nodes) {
       if (repo.isArchived) continue;
 
-      // Use the parent repo name if it's a fork, to track the original project
       const fullName = (repo.isFork && repo.parent) ? repo.parent.nameWithOwner : repo.nameWithOwner;
       const [owner, name] = fullName.split("/");
 

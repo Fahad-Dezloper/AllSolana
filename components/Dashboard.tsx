@@ -153,6 +153,7 @@ export function Dashboard({ data }: DashboardProps) {
         sortBy={sortBy}
         setSortBy={setSortBy}
         clearFilters={clearFilters}
+        existingRepos={data.projects.map(p => p.fullName)}
       />
     </div>
   );

@@ -44,7 +44,9 @@ export function ProjectCard({
             <h3 className="text-[14px] font-bold text-white truncate uppercase tracking-wider group-hover:text-solana-green transition-colors">
               {project.name}
             </h3>
-            <p className="text-[11px] text-muted truncate font-mono uppercase">{project.owner.login}</p>
+            <p className="text-[11px] text-muted truncate font-mono uppercase">
+              {project.owner.login}
+            </p>
           </div>
         </div>
         <ArrowUpRight
@@ -55,7 +57,9 @@ export function ProjectCard({
 
       <div className="h-10 mb-6 flex-grow">
         <p className="text-[13px] text-[#aaa] leading-relaxed line-clamp-2 font-light">
-          {project.summary || project.description || "No description available."}
+          {project.summary ||
+            project.description ||
+            "No description available."}
         </p>
       </div>
 
@@ -74,17 +78,23 @@ export function ProjectCard({
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="stat-pill">
             <Star size={12} className="text-muted-2" />
-            <span className="font-mono text-[11px] text-white">{(project.stars || 0).toLocaleString()}</span>
+            <span className="font-mono text-[11px] text-white">
+              {(project.stars || 0).toLocaleString()}
+            </span>
           </div>
           <div className="stat-pill">
             <GitPullRequest size={12} className="text-muted-2" />
-            <span className="font-mono text-[11px] text-white">{(project.pullRequests || 0).toLocaleString()}</span>
+            <span className="font-mono text-[11px] text-white">
+              {(project.pullRequests || 0).toLocaleString()}
+            </span>
           </div>
         </div>
         <div className="stat-pill">
-            <div className="w-1.5 h-1.5 bg-accent-secondary" />
-            <span className="font-mono text-[11px] text-accent-secondary">{project.openIssues} ISSUES</span>
-          </div>
+          <div className="w-1.5 h-1.5 bg-accent-secondary" />
+          <span className="font-mono text-[11px] text-accent-secondary">
+            {project.openIssues} ISSUES
+          </span>
+        </div>
         {/* <span className="text-[10px] text-muted-2 font-mono uppercase">
           {timeAgo(project.pushedAt)}
         </span> */}
