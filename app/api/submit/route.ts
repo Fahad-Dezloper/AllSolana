@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { revalidateTag, revalidatePath } from "next/cache";
 
 export async function POST(request: Request) {
   try {
@@ -15,19 +16,23 @@ export async function POST(request: Request) {
     const project = await prisma.project.upsert({
       where: { fullName },
       update: {
-        submittedBy,
-        isPending: true,
+        submittedBy: submittedBy || null,
+        isPending: false, 
+        isSolanaRelated: true,
       },
       create: {
         fullName,
         ownerLogin: derivedOwner,
         summary: summary || "",
         submittedBy: submittedBy || null,
-        isPending: true,
+        isPending: false, 
         category: "Other",
         isSolanaRelated: true,
+        analysisSource: "manual",
       },
     });
+
+    revalidatePath("/");
 
     return NextResponse.json({ success: true, project });
   } catch (error) {

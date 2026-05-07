@@ -99,13 +99,6 @@ export function SubmitRepoDialog({
       status: "idle",
     },
     {
-      id: "solana",
-      label: "ECOSYSTEM CHECK",
-      description: "Verifying Solana alignment & tech stack",
-      icon: Cpu,
-      status: "idle",
-    },
-    {
       id: "final",
       label: "ELIGIBILITY",
       description: "Final verification result",
@@ -157,9 +150,13 @@ export function SubmitRepoDialog({
 
       try {
         if (stepId === "duplicate") {
-          if (existingRepos.some((r) => r.toLowerCase() === fullName)) {
-            isSuccess = false;
-            failureReason = "REPOSITORY ALREADY EXISTS IN OUR INDEX";
+          const checkRes = await fetch(`/api/check-repo?fullName=${fullName}`);
+          if (checkRes.ok) {
+            const { exists } = await checkRes.json();
+            if (exists) {
+              isSuccess = false;
+              failureReason = "REPOSITORY ALREADY INDEXED IN REGISTRY";
+            }
           }
         } else if (stepId === "fetch" || stepId === "activity") {
           const res = await fetch(`https://api.github.com/repos/${fullName}`);
@@ -206,31 +203,6 @@ export function SubmitRepoDialog({
               failureReason = "README MISSING SETUP OR CONTRIBUTION GUIDELINES";
             }
           }
-        } else if (stepId === "solana") {
-          const [repoRes, contentsRes] = await Promise.all([
-            fetch(`https://api.github.com/repos/${fullName}`),
-            fetch(`https://api.github.com/repos/${fullName}/contents`),
-          ]);
-
-          const repoData = await repoRes.json();
-          const contents = contentsRes.ok ? await contentsRes.json() : [];
-
-          const hasSolanaTopic = repoData.topics?.some((t: string) =>
-            ["solana", "anchor", "blockchain", "web3", "crypto"].includes(
-              t.toLowerCase(),
-            ),
-          );
-
-          const hasSolanaFiles = contents.some((f: any) =>
-            ["Anchor.toml", "Cargo.toml", "solana", "program"].some((name) =>
-              f.name.toLowerCase().includes(name),
-            ),
-          );
-
-          if (!hasSolanaTopic && !hasSolanaFiles) {
-            isSuccess = false;
-            failureReason = "NOT A SOLANA REPOSITORY (ECOSYSTEM MISMATCH)";
-          }
         }
       } catch (err) {
         isSuccess = false;
@@ -256,7 +228,10 @@ export function SubmitRepoDialog({
 
   const [isAttributed, setIsAttributed] = useState(false);
 
-  const submitFinal = async (usernameOverride?: string, isManual: boolean = true) => {
+  const submitFinal = async (
+    usernameOverride?: string,
+    isManual: boolean = true,
+  ) => {
     setIsSubmitting(true);
     try {
       const parts = repoUrl.split("github.com/")[1]?.split("/");
@@ -364,29 +339,42 @@ export function SubmitRepoDialog({
                       className="flex flex-col items-center text-center gap-3"
                     >
                       <div className="w-12 h-12 bg-solana-green rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(20,241,149,0.3)]">
-                        <Check size={24} className="text-black" strokeWidth={3} />
+                        <Check
+                          size={24}
+                          className="text-black"
+                          strokeWidth={3}
+                        />
                       </div>
                       <div>
                         <h3 className="text-white font-black uppercase tracking-tighter text-lg">
-                          {isAttributed ? "Attribution Saved" : "Audit Complete"}
+                          {isAttributed
+                            ? "Attribution Saved"
+                            : "Audit Complete"}
                         </h3>
                         <p className="text-solana-green/80 text-[10px] font-bold uppercase tracking-[0.2em]">
-                          {isAttributed ? "Thank you for contributing!" : "Registry Updated Successfully"}
+                          {isAttributed
+                            ? "Thank you for contributing!"
+                            : "Registry Updated Successfully"}
                         </p>
                       </div>
                     </motion.div>
                   ) : (
                     <>
                       <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        {React.createElement(steps[currentStep].icon, { size: 64, className: "text-white" })}
+                        {React.createElement(steps[currentStep].icon, {
+                          size: 64,
+                          className: "text-white",
+                        })}
                       </div>
-                      
+
                       <div className="flex items-center gap-4 mb-4 relative z-10">
                         <div className="w-10 h-10 rounded-xl bg-white text-black flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.1)]">
                           {steps[currentStep].status === "loading" ? (
                             <Loader2 size={20} className="animate-spin" />
                           ) : (
-                            React.createElement(steps[currentStep].icon, { size: 20 })
+                            React.createElement(steps[currentStep].icon, {
+                              size: 20,
+                            })
                           )}
                         </div>
                         <div>
@@ -398,10 +386,12 @@ export function SubmitRepoDialog({
                           </h3>
                         </div>
                       </div>
-                      
+
                       <p className="text-sm font-bold text-white leading-relaxed relative z-10">
                         {errorReason ? (
-                          <span className="text-red-500 font-black">{errorReason}</span>
+                          <span className="text-red-500 font-black">
+                            {errorReason}
+                          </span>
                         ) : (
                           steps[currentStep].description
                         )}
@@ -409,13 +399,13 @@ export function SubmitRepoDialog({
 
                       <div className="flex gap-1.5 mt-6 relative z-10">
                         {steps.map((_, i) => (
-                          <div 
+                          <div
                             key={i}
                             className={`h-1 rounded-full transition-all duration-500 ${
-                              i === currentStep 
-                                ? "w-8 bg-white" 
-                                : i < currentStep 
-                                  ? "w-4 bg-solana-green" 
+                              i === currentStep
+                                ? "w-8 bg-white"
+                                : i < currentStep
+                                  ? "w-4 bg-solana-green"
                                   : "w-2 bg-neutral-800"
                             }`}
                           />
@@ -434,7 +424,8 @@ export function SubmitRepoDialog({
                   >
                     <div className="space-y-2">
                       <label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500 ml-1">
-                        Tag Yourself <span className="opacity-50">(Optional)</span>
+                        Tag Yourself{" "}
+                        <span className="opacity-50">(Optional)</span>
                       </label>
                       <div className="relative">
                         <GithubIcon
@@ -445,7 +436,9 @@ export function SubmitRepoDialog({
                           type="text"
                           placeholder="GitHub Username"
                           value={contributorUsername}
-                          onChange={(e) => setContributorUsername(e.target.value)}
+                          onChange={(e) =>
+                            setContributorUsername(e.target.value)
+                          }
                           className="w-full bg-neutral-900 border border-neutral-800 rounded-2xl py-3.5 pl-11 pr-4 text-xs font-bold text-white placeholder:text-neutral-700 focus:outline-none focus:border-white/20 transition-all uppercase tracking-widest"
                         />
                       </div>
@@ -464,7 +457,11 @@ export function SubmitRepoDialog({
                           disabled={!contributorUsername || isSubmitting}
                           className="flex-[2] px-6 py-4 bg-solana-green text-black rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-solana-green/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                         >
-                          {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : "Submit Attribution"}
+                          {isSubmitting ? (
+                            <Loader2 size={14} className="animate-spin" />
+                          ) : (
+                            "Submit Attribution"
+                          )}
                         </button>
                       </div>
                     )}
