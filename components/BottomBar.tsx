@@ -251,7 +251,6 @@ export function BottomBar({
   return (
     <section className="fixed bottom-6 left-0 right-0 z-40 px-2 sm:px-4 flex justify-center">
       <div className="flex items-center gap-1 sm:gap-2 rounded-full border border-neutral-700/50 bg-neutral-900/90 px-1.5 sm:px-3 py-1.5 sm:py-2 shadow-2xl shadow-black/50 backdrop-blur-xl max-w-full">
-        {/* Search Section */}
         <div className="relative flex items-center">
           <Search size={14} className="absolute left-3 text-neutral-500" />
           <input
@@ -266,7 +265,6 @@ export function BottomBar({
 
         <div className="h-6 w-px bg-neutral-700/50" />
 
-        {/* Filters Section */}
         <div className="flex items-center gap-1">
           <Dropdown
             label="CAT"
@@ -286,12 +284,7 @@ export function BottomBar({
 
         <div className="h-6 w-px bg-neutral-700/50" />
 
-        {/* Actions Section */}
         <div className="flex items-center gap-1">
-          {/* <button className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-neutral-400 transition-all hover:bg-neutral-800 hover:text-white">
-            <span className="hidden sm:inline">Submit</span>
-            <span className="sm:hidden">+</span>
-          </button> */}
 
           <button
             onClick={() => setIsSubmitDialogOpen(true)}

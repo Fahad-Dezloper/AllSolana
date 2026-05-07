@@ -23,12 +23,11 @@ export async function getSolanaProjects(): Promise<ProjectsResponse> {
 
   const fullNames = dbProjects.map(p => p.fullName).sort();
   
-  // Best practice: Use unstable_cache for persistent server-side caching
   const getCachedLiveData = unstable_cache(
     async (names: string[]) => {
       console.log("[Projects] Fetching fresh live data from GitHub...");
       const map = await fetchLiveRepoData(names);
-      return Array.from(map.entries()); // Serializable for cache
+      return Array.from(map.entries());
     },
     ["github-live-data-v2"],
     { revalidate: 3600, tags: ["projects"] }

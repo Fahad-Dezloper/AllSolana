@@ -136,7 +136,6 @@ export function SubmitRepoDialog({
   const startVerification = async () => {
     if (!repoUrl.includes("github.com/")) return;
 
-    // Extract owner/repo
     const parts = repoUrl.split("github.com/")[1]?.split("/");
     if (!parts || parts.length < 2) return;
     const fullName = `${parts[0]}/${parts[1]}`.toLowerCase();
@@ -151,7 +150,6 @@ export function SubmitRepoDialog({
 
       await new Promise((r) => setTimeout(r, 1000 + Math.random() * 500));
 
-      // Step Specific Logic
       const stepId = steps[i].id;
       let isSuccess = true;
       let failureReason = "";
@@ -183,7 +181,6 @@ export function SubmitRepoDialog({
             }
           }
         } else if (stepId === "quality") {
-          // Real check: Fetch README and scan for keywords
           const res = await fetch(`https://api.github.com/repos/${fullName}/readme`);
           if (!res.ok) {
             isSuccess = false;
@@ -200,7 +197,6 @@ export function SubmitRepoDialog({
             }
           }
         } else if (stepId === "solana") {
-          // Real check: Check topics and files
           const [repoRes, contentsRes] = await Promise.all([
             fetch(`https://api.github.com/repos/${fullName}`),
             fetch(`https://api.github.com/repos/${fullName}/contents`)
@@ -241,7 +237,6 @@ export function SubmitRepoDialog({
     }
     
     setIsVerified(true);
-    // After a short delay, show the contributor input
     setTimeout(() => setShowContributorInput(true), 1500);
   };
 
@@ -262,8 +257,7 @@ export function SubmitRepoDialog({
       });
       
       if (res.ok) {
-        setIsVerifying(false); // Done
-        // Wait a bit then close or show final success
+        setIsVerifying(false);
         setTimeout(() => handleClose(), 2000);
       } else {
         const error = await res.json();

@@ -9,12 +9,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // Upsert project
     const project = await prisma.project.upsert({
       where: { fullName },
       update: {
         submittedBy,
-        isPending: true, // Mark as pending for review
+        isPending: true,
       },
       create: {
         fullName,
@@ -22,7 +21,7 @@ export async function POST(request: Request) {
         summary: summary || "",
         submittedBy,
         isPending: true,
-        category: "Other", // Default
+        category: "Other",
         isSolanaRelated: true,
       },
     });
