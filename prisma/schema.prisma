@@ -21,6 +21,8 @@ model Project {
   analysisSource  String               @default("heuristic")
   lastScannedAt   DateTime             @default(now())
   heuristicScore  Int                  @default(0)
+  isPending       Boolean              @default(true)
+  submittedBy     String?
   contributors    ProjectContributor[]
 
   @@index([category])
