@@ -23,7 +23,10 @@ function Dropdown({ label, options, selected, onToggle }: DropdownProps) {
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     }
@@ -43,10 +46,13 @@ function Dropdown({ label, options, selected, onToggle }: DropdownProps) {
           {displaySelected.length === 0 || displaySelected.includes("All")
             ? "ALL"
             : displaySelected.length === 1
-            ? displaySelected[0].toUpperCase()
-            : `${displaySelected.length} SELECTED`}
+              ? displaySelected[0].toUpperCase()
+              : `${displaySelected.length} SELECTED`}
         </span>
-        <ChevronDown size={14} className={`transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown
+          size={14}
+          className={`transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+        />
       </button>
 
       {isOpen && (
@@ -60,38 +66,68 @@ function Dropdown({ label, options, selected, onToggle }: DropdownProps) {
               className="group flex items-center justify-between w-full px-3 py-2.5 text-[11px] font-semibold uppercase tracking-widest rounded-xl transition-all hover:bg-neutral-800 text-left"
             >
               <div className="flex items-center gap-3">
-                <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-                  (selected.length === 0 || selected.includes("All")) 
-                    ? "bg-accent border-accent" 
-                    : "border-neutral-700 group-hover:border-neutral-500"
-                }`}>
-                  {(selected.length === 0 || selected.includes("All")) && <Check size={10} className="text-white" strokeWidth={3} />}
+                <div
+                  className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                    selected.length === 0 || selected.includes("All")
+                      ? "bg-accent border-accent"
+                      : "border-neutral-700 group-hover:border-neutral-500"
+                  }`}
+                >
+                  {(selected.length === 0 || selected.includes("All")) && (
+                    <Check size={10} className="text-white" strokeWidth={3} />
+                  )}
                 </div>
-                <span className={(selected.length === 0 || selected.includes("All")) ? "text-white" : "text-neutral-400 group-hover:text-neutral-300"}>All</span>
+                <span
+                  className={
+                    selected.length === 0 || selected.includes("All")
+                      ? "text-white"
+                      : "text-neutral-400 group-hover:text-neutral-300"
+                  }
+                >
+                  All
+                </span>
               </div>
             </button>
             <div className="h-px bg-neutral-800 my-1 mx-2" />
-            {options.filter((o) => o !== "All").map((opt) => {
-              const isSelected = selected.includes(opt);
-              return (
-                <button
-                  key={opt}
-                  onClick={() => onToggle(opt)}
-                  className="group flex items-center justify-between w-full px-3 py-2.5 text-[11px] font-semibold uppercase tracking-widest rounded-xl transition-all hover:bg-neutral-800 text-left"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-                      isSelected 
-                        ? "bg-accent border-accent" 
-                        : "border-neutral-700 group-hover:border-neutral-500"
-                    }`}>
-                      {isSelected && <Check size={10} className="text-white" strokeWidth={3} />}
+            {options
+              .filter((o) => o !== "All")
+              .map((opt) => {
+                const isSelected = selected.includes(opt);
+                return (
+                  <button
+                    key={opt}
+                    onClick={() => onToggle(opt)}
+                    className="group flex items-center justify-between w-full px-3 py-2.5 text-[11px] font-semibold uppercase tracking-widest rounded-xl transition-all hover:bg-neutral-800 text-left"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                          isSelected
+                            ? "bg-accent border-accent"
+                            : "border-neutral-700 group-hover:border-neutral-500"
+                        }`}
+                      >
+                        {isSelected && (
+                          <Check
+                            size={10}
+                            className="text-white"
+                            strokeWidth={3}
+                          />
+                        )}
+                      </div>
+                      <span
+                        className={
+                          isSelected
+                            ? "text-white"
+                            : "text-neutral-400 group-hover:text-neutral-300"
+                        }
+                      >
+                        {opt}
+                      </span>
                     </div>
-                    <span className={isSelected ? "text-white" : "text-neutral-400 group-hover:text-neutral-300"}>{opt}</span>
-                  </div>
-                </button>
-              );
-            })}
+                  </button>
+                );
+              })}
           </div>
         </div>
       )}
@@ -102,7 +138,7 @@ function Dropdown({ label, options, selected, onToggle }: DropdownProps) {
 interface BottomBarProps {
   search: string;
   setSearch: (val: string) => void;
-  allCategories: string[] ;
+  allCategories: string[];
   selectedCategories: string[];
   toggleCategory: (cat: string) => void;
   allLanguages: string[];
@@ -113,7 +149,13 @@ interface BottomBarProps {
   clearFilters: () => void;
 }
 
-function SortDropdown({ current, onSelect }: { current: string, onSelect: (val: string) => void }) {
+function SortDropdown({
+  current,
+  onSelect,
+}: {
+  current: string;
+  onSelect: (val: string) => void;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -126,7 +168,10 @@ function SortDropdown({ current, onSelect }: { current: string, onSelect: (val: 
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     }
@@ -134,7 +179,8 @@ function SortDropdown({ current, onSelect }: { current: string, onSelect: (val: 
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const currentLabel = options.find(o => o.value === current)?.label || "RECENT";
+  const currentLabel =
+    options.find((o) => o.value === current)?.label || "RECENT";
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -145,7 +191,10 @@ function SortDropdown({ current, onSelect }: { current: string, onSelect: (val: 
         <span className="text-neutral-500 hidden sm:inline">SORT:</span>
         <span className="text-neutral-500 sm:hidden">S:</span>
         <span>{currentLabel}</span>
-        <ChevronDown size={14} className={`transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown
+          size={14}
+          className={`transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+        />
       </button>
 
       {isOpen && (
@@ -159,11 +208,15 @@ function SortDropdown({ current, onSelect }: { current: string, onSelect: (val: 
                   setIsOpen(false);
                 }}
                 className={`flex items-center justify-between w-full px-3 py-2.5 text-[11px] font-semibold uppercase tracking-widest rounded-xl transition-all hover:bg-neutral-800 text-left ${
-                  current === opt.value ? "text-white bg-neutral-800" : "text-neutral-400 group-hover:text-neutral-300"
+                  current === opt.value
+                    ? "text-white bg-neutral-800"
+                    : "text-neutral-400 group-hover:text-neutral-300"
                 }`}
               >
                 {opt.label}
-                {current === opt.value && <Check size={10} className="text-white" strokeWidth={3} />}
+                {current === opt.value && (
+                  <Check size={10} className="text-white" strokeWidth={3} />
+                )}
               </button>
             ))}
           </div>
@@ -186,15 +239,14 @@ export function BottomBar({
   setSortBy,
   clearFilters,
 }: BottomBarProps) {
-  const hasActiveFilters = 
-    (selectedCategories.length > 0 && selectedCategories[0] !== "All") || 
-    (selectedLanguages.length > 0 && selectedLanguages[0] !== "All") || 
+  const hasActiveFilters =
+    (selectedCategories.length > 0 && selectedCategories[0] !== "All") ||
+    (selectedLanguages.length > 0 && selectedLanguages[0] !== "All") ||
     search !== "";
 
   return (
     <section className="fixed bottom-6 left-0 right-0 z-40 px-2 sm:px-4 flex justify-center">
-      <div className="flex items-center gap-1 sm:gap-2 rounded-full border border-neutral-700/50 bg-neutral-900/90 px-1.5 sm:px-3 py-1.5 sm:py-2 shadow-2xl shadow-black/50 backdrop-blur-xl max-w-full overflow-x-auto no-scrollbar">
-        
+      <div className="flex items-center gap-1 sm:gap-2 rounded-full border border-neutral-700/50 bg-neutral-900/90 px-1.5 sm:px-3 py-1.5 sm:py-2 shadow-2xl shadow-black/50 backdrop-blur-xl max-w-full">
         {/* Search Section */}
         <div className="relative flex items-center">
           <Search size={14} className="absolute left-3 text-neutral-500" />
@@ -225,10 +277,7 @@ export function BottomBar({
             onToggle={toggleLanguage}
           />
           <div className="h-6 w-px bg-neutral-700/50" />
-          <SortDropdown 
-            current={sortBy}
-            onSelect={setSortBy}
-          />
+          <SortDropdown current={sortBy} onSelect={setSortBy} />
         </div>
 
         <div className="h-6 w-px bg-neutral-700/50" />
