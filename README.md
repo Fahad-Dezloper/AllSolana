@@ -1,54 +1,149 @@
-# Solana Open Source Tracker
+# 🚀 Solana Contribution Index
 
-A high-performance, AI-driven dashboard to discover and contribute to the best open-source projects in the Solana ecosystem.
+A high-fidelity, technical dashboard for discovering and contributing to the most active open-source projects in the Solana ecosystem.
 
-## 🚀 Vision
-Built for the community, this tool tracks the GitHub activity of Superteam members and Solana ecosystem leaders to surface projects that matter. It automatically identifies Solana-related repos using heuristics and Gemini AI, highlighting where developers can make an impact.
+## 📖 About the Project
+This platform indexes authentic Solana projects by auditing commit history, documentation quality, and ecosystem alignment. It serves as a gateway for developers to find high-impact contribution opportunities and for project owners to surface their work to the community.
 
-## ✨ Key Features
-- **Smart Discovery**: Tracks GitHub activity of 15+ ecosystem leaders.
-- **Two-Tier Analysis**: 
-  - **Fast Heuristics**: Immediate classification by topics, keywords, and file indicators.
-  - **AI Analysis**: Deep contextual understanding using Gemini 2.0 Flash.
-- **Persistent Storage**: Powered by PostgreSQL and Prisma for sub-second performance.
-- **Background Refresh**: Data stays fresh with non-blocking background synchronization.
-- **Good First Issues**: Directly surfaces beginner-friendly tasks.
-- **Premium UI**: Modern, glassmorphic design built with Tailwind CSS v4.
+## 📦 Indexed Repositories (92)
 
-## 🛠 Tech Stack
-- **Framework**: Next.js 16 (App Router)
-- **Database**: PostgreSQL with Prisma
-- **AI**: Gemini 2.0 Flash via Vercel AI SDK
-- **Styling**: Tailwind CSS v4
-- **API**: GitHub GraphQL API
+| Repository Name | Organization/Owner | GitHub Link |
+|:--- |:--- |:--- |
+| solana-arbitrage-bot | 0xNineteen | [Link](https://github.com/0xNineteen/solana-arbitrage-bot) |
+| valid8 | 3uild-3thos | [Link](https://github.com/3uild-3thos/valid8) |
+| cNFT-candy-machine | ASCorreia | [Link](https://github.com/ASCorreia/cNFT-candy-machine) |
+| token-vesting | Bonfida | [Link](https://github.com/Bonfida/token-vesting) |
+| crate | CrateProtocol | [Link](https://github.com/CrateProtocol/crate) |
+| seraph | Eliascm17 | [Link](https://github.com/Eliascm17/seraph) |
+| eloizer | Inversive-Labs | [Link](https://github.com/Inversive-Labs/eloizer) |
+| solana-course | Unboxed-Software | [Link](https://github.com/Unboxed-Software/solana-course) |
+| rpc_speed | alphabatem | [Link](https://github.com/alphabatem/rpc_speed) |
+| solana-sdk | anza-xyz | [Link](https://github.com/anza-xyz/solana-sdk) |
+| wallet-adapter | anza-xyz | [Link](https://github.com/anza-xyz/wallet-adapter) |
+| anchor-lang | armaniferrante | [Link](https://github.com/armaniferrante/anchor-lang) |
+| auction-house | armaniferrante | [Link](https://github.com/armaniferrante/auction-house) |
+| serum-quickstart | armaniferrante | [Link](https://github.com/armaniferrante/serum-quickstart) |
+| solanabook | ashpoolin | [Link](https://github.com/ashpoolin/solanabook) |
+| perpetuals | askibin | [Link](https://github.com/askibin/perpetuals) |
+| anchor-idl-guard | blueshift-gg | [Link](https://github.com/blueshift-gg/anchor-idl-guard) |
+| quasar | blueshift-gg | [Link](https://github.com/blueshift-gg/quasar) |
+| soloha | callensm | [Link](https://github.com/callensm/soloha) |
+| solana-accountsdb-connector | ckamm | [Link](https://github.com/ckamm/solana-accountsdb-connector) |
+| apr-ui | coral-xyz | [Link](https://github.com/coral-xyz/apr-ui) |
+| backpack | coral-xyz | [Link](https://github.com/coral-xyz/backpack) |
+| LibreChat | danny-avila | [Link](https://github.com/danny-avila/LibreChat) |
+| solana | devonbeard | [Link](https://github.com/devonbeard/solana) |
+| gill | gillsdk | [Link](https://github.com/gillsdk/gill) |
+| geyser-kafka | ironforge-cloud | [Link](https://github.com/ironforge-cloud/geyser-kafka) |
+| geyser-store | ironforge-cloud | [Link](https://github.com/ironforge-cloud/geyser-store) |
+| mudlands | ironforge-cloud | [Link](https://github.com/ironforge-cloud/mudlands) |
+| scrapey | ironforge-cloud | [Link](https://github.com/ironforge-cloud/scrapey) |
+| soldev-ui-old | ironforge-cloud | [Link](https://github.com/ironforge-cloud/soldev-ui-old) |
+| Token-Creator | jacobcreech | [Link](https://github.com/jacobcreech/Token-Creator) |
+| profiling-anchor | jacobcreech | [Link](https://github.com/jacobcreech/profiling-anchor) |
+| solana-web3-reference | jacobcreech | [Link](https://github.com/jacobcreech/solana-web3-reference) |
+| spl20 | jacobcreech | [Link](https://github.com/jacobcreech/spl20) |
+| distributor | jito-foundation | [Link](https://github.com/jito-foundation/distributor) |
+| geyser-grpc-plugin | jito-foundation | [Link](https://github.com/jito-foundation/geyser-grpc-plugin) |
+| jito-account-traits-derive | jito-foundation | [Link](https://github.com/jito-foundation/jito-account-traits-derive) |
+| jito-bam-boost-cli | jito-foundation | [Link](https://github.com/jito-foundation/jito-bam-boost-cli) |
+| jito-bell | jito-foundation | [Link](https://github.com/jito-foundation/jito-bell) |
+| jito-bls-ncn | jito-foundation | [Link](https://github.com/jito-foundation/jito-bls-ncn) |
+| jito-bytemuck | jito-foundation | [Link](https://github.com/jito-foundation/jito-bytemuck) |
+| jito-omnidocs | jito-foundation | [Link](https://github.com/jito-foundation/jito-omnidocs) |
+| jito-programs | jito-foundation | [Link](https://github.com/jito-foundation/jito-programs) |
+| jito-relayer | jito-foundation | [Link](https://github.com/jito-foundation/jito-relayer) |
+| jito-solana | jito-foundation | [Link](https://github.com/jito-foundation/jito-solana) |
+| jito-stake-unstake-reference | jito-foundation | [Link](https://github.com/jito-foundation/jito-stake-unstake-reference) |
+| jito-tip-router | jito-foundation | [Link](https://github.com/jito-foundation/jito-tip-router) |
+| jito-whitelist-management | jito-foundation | [Link](https://github.com/jito-foundation/jito-whitelist-management) |
+| kobe | jito-foundation | [Link](https://github.com/jito-foundation/kobe) |
+| solana-analysis | jito-foundation | [Link](https://github.com/jito-foundation/solana-analysis) |
+| stakenet | jito-foundation | [Link](https://github.com/jito-foundation/stakenet) |
+| solana-program-library | joncinque | [Link](https://github.com/joncinque/solana-program-library) |
+| solana-feed-rs | jstarry | [Link](https://github.com/jstarry/solana-feed-rs) |
+| solana-wasm | jstarry | [Link](https://github.com/jstarry/solana-wasm) |
+| solana-workshop-tw | jstarry | [Link](https://github.com/jstarry/solana-workshop-tw) |
+| solana-governance-think-tank | laine-sa | [Link](https://github.com/laine-sa/solana-governance-think-tank) |
+| python-redis-mongodb | mertaydogan | [Link](https://github.com/mertaydogan/python-redis-mongodb) |
+| digital-asset-rpc-infrastructure | metaplex-foundation | [Link](https://github.com/metaplex-foundation/digital-asset-rpc-infrastructure) |
+| metaplex | metaplex-foundation | [Link](https://github.com/metaplex-foundation/metaplex) |
+| metaplex-program-library | metaplex-foundation | [Link](https://github.com/metaplex-foundation/metaplex-program-library) |
+| account-compression-macro | ngundotra | [Link](https://github.com/ngundotra/account-compression-macro) |
+| additional-accounts-request-transfer-spec | ngundotra | [Link](https://github.com/ngundotra/additional-accounts-request-transfer-spec) |
+| rosetta-solana-programs | ngundotra | [Link](https://github.com/ngundotra/rosetta-solana-programs) |
+| solana-gpt-plugin | ngundotra | [Link](https://github.com/ngundotra/solana-gpt-plugin) |
+| solana-interface-permissioned-tfer | ngundotra | [Link](https://github.com/ngundotra/solana-interface-permissioned-tfer) |
+| solana-transfer-compressed-nfts | ngundotra | [Link](https://github.com/ngundotra/solana-transfer-compressed-nfts) |
+| spyglass-solana | ngundotra | [Link](https://github.com/ngundotra/spyglass-solana) |
+| squads-reverse-map-api | ngundotra | [Link](https://github.com/ngundotra/squads-reverse-map-api) |
+| srfc-event-indexing | ngundotra | [Link](https://github.com/ngundotra/srfc-event-indexing) |
+| x402-solana | ngundotra | [Link](https://github.com/ngundotra/x402-solana) |
+| solana-data-program | nvsriram | [Link](https://github.com/nvsriram/solana-data-program) |
+| serum-dex | project-serum | [Link](https://github.com/project-serum/serum-dex) |
+| wiki | solana-community | [Link](https://github.com/solana-community/wiki) |
+| one-milion-nfts | solana-developers | [Link](https://github.com/solana-developers/one-milion-nfts) |
+| pirate-bootcamp | solana-developers | [Link](https://github.com/solana-developers/pirate-bootcamp) |
+| solana-cookbook | solana-developers | [Link](https://github.com/solana-developers/solana-cookbook) |
+| workshop-solana-basics | solana-developers | [Link](https://github.com/solana-developers/workshop-solana-basics) |
+| anchor | solana-foundation | [Link](https://github.com/solana-foundation/anchor) |
+| create-solana-dapp | solana-foundation | [Link](https://github.com/solana-foundation/create-solana-dapp) |
+| solana-go | solana-foundation | [Link](https://github.com/solana-foundation/solana-go) |
+| solana-improvement-documents | solana-foundation | [Link](https://github.com/solana-foundation/solana-improvement-documents) |
+| solana-mcp-official | solana-foundation | [Link](https://github.com/solana-foundation/solana-mcp-official) |
+| solana-verifiable-build | solana-foundation | [Link](https://github.com/solana-foundation/solana-verifiable-build) |
+| solana-web3.js | solana-foundation | [Link](https://github.com/solana-foundation/solana-web3.js) |
+| surfpool | solana-foundation | [Link](https://github.com/solana-foundation/surfpool) |
+| solana-idl-spec | solana-idl-foundation | [Link](https://github.com/solana-idl-foundation/solana-idl-spec) |
+| example-helloworld | solana-labs | [Link](https://github.com/solana-labs/example-helloworld) |
+| solana | solana-labs | [Link](https://github.com/solana-labs/solana) |
+| solana-perf-libs | solana-labs | [Link](https://github.com/solana-labs/solana-perf-libs) |
+| solana-program-library | solana-labs | [Link](https://github.com/solana-labs/solana-program-library) |
+| star_frame | staratlasmeta | [Link](https://github.com/staratlasmeta/star_frame) |
+| solana-workbench | workbenchapp | [Link](https://github.com/workbenchapp/solana-workbench) |
 
-## 🏁 Getting Started
+## 🛠 Setup Instructions
 
-### 1. Prerequisites
-- Node.js 20+
-- A PostgreSQL database
-- A GitHub Personal Access Token (PAT)
-- A Google Generative AI (Gemini) API Key
+1. **Clone & Install**:
+   ```bash
+   git clone <repo-url>
+   cd contribute
+   pnpm install
+   ```
 
-### 2. Setup
-```bash
-# 1. Clone and install
-npm install
+2. **Environment Setup**:
+   Create a `.env` file with:
+   ```env
+   DATABASE_URL="your-postgresql-url"
+   GITHUB_TOKEN="your-github-pat"
+   GOOGLE_GENERATIVE_AI_API_KEY="your-gemini-key"
+   ```
 
-# 2. Configure environment
-cp .env.example .env
-# Fill in GITHUB_TOKEN, GOOGLE_GENERATIVE_AI_API_KEY, and DATABASE_URL in .env
+3. **Database Sync**:
+   ```bash
+   npx prisma db push
+   npx prisma generate
+   ```
 
-# 3. Setup Database
-npx prisma db push
-```
+4. **Run Development Server**:
+   ```bash
+   pnpm run dev
+   ```
 
-### 3. Run Development
-```bash
-npm run dev
-```
+## 🤝 Contribution Guidelines
+Want to add a repository or improve the codebase? 
+Check out our [Contribution Guidelines](./CONTRIBUTING.md) (coming soon) or simply use the **"Add Repository"** button in the dashboard.
 
-Open [http://localhost:3000](http://localhost:3000) to see the tracker. The first load will trigger an initial sync to populate your database.
+## 🏆 Our Contributors
 
-## 📖 Architecture
-See [DOCS.md](./DOCS.md) for a deep dive into the discovery pipeline and data classification logic.
+### 🏗 Codebase Contributors
+People who have built and maintained this platform.
+- **@dezloper** (Lead Architect)
+- **@antigravity-ai** (AI Assistant)
+
+### 📂 Repository Contributors
+People who have discovered and submitted high-quality repositories to our index.
+_No repository contributors yet. Submit a repo to be the first!_
+
+---
+*Maintained by the Solana Community*

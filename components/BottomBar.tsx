@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Search, ChevronDown, Check, X } from "lucide-react";
+import { Search, ChevronDown, Check, X, Plus } from "lucide-react";
+import { SubmitRepoDialog } from "./SubmitRepoDialog";
 
 interface DropdownProps {
   label: string;
@@ -147,6 +148,7 @@ interface BottomBarProps {
   sortBy: string;
   setSortBy: (val: string) => void;
   clearFilters: () => void;
+  existingRepos: string[];
 }
 
 function SortDropdown({
@@ -238,7 +240,9 @@ export function BottomBar({
   sortBy,
   setSortBy,
   clearFilters,
+  existingRepos,
 }: BottomBarProps) {
+  const [isSubmitDialogOpen, setIsSubmitDialogOpen] = useState(false);
   const hasActiveFilters =
     (selectedCategories.length > 0 && selectedCategories[0] !== "All") ||
     (selectedLanguages.length > 0 && selectedLanguages[0] !== "All") ||
@@ -289,6 +293,14 @@ export function BottomBar({
             <span className="sm:hidden">+</span>
           </button> */}
 
+          <button
+            onClick={() => setIsSubmitDialogOpen(true)}
+            className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-widest text-neutral-400 transition-all hover:bg-neutral-800 hover:text-white"
+          >
+            <Plus size={14} />
+            <span>Add</span>
+          </button>
+
           {hasActiveFilters && (
             <>
               <div className="h-6 w-px bg-neutral-700/50" />
@@ -303,6 +315,12 @@ export function BottomBar({
           )}
         </div>
       </div>
+
+      <SubmitRepoDialog
+        isOpen={isSubmitDialogOpen}
+        onClose={() => setIsSubmitDialogOpen(false)}
+        existingRepos={existingRepos}
+      />
     </section>
   );
 }
