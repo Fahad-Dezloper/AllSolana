@@ -2,7 +2,7 @@
 
 High-density index of active repositories on Solana. Discover and Contribute to the most active open-source projects in the Solana ecosystem.
 
-## 📦 Indexed Repositories (88)
+## Indexed Repositories (94)
 
 | Repository Name | Organization/Owner | GitHub Link |
 |:--- |:--- |:--- |
@@ -15,6 +15,7 @@ High-density index of active repositories on Solana. Discover and Contribute to 
 | eloizer | Inversive-Labs | [Link](https://github.com/Inversive-Labs/eloizer) |
 | solana-course | Unboxed-Software | [Link](https://github.com/Unboxed-Software/solana-course) |
 | rpc_speed | alphabatem | [Link](https://github.com/alphabatem/rpc_speed) |
+| mollusk | anza-xyz | [Link](https://github.com/anza-xyz/mollusk) |
 | solana-sdk | anza-xyz | [Link](https://github.com/anza-xyz/solana-sdk) |
 | wallet-adapter | anza-xyz | [Link](https://github.com/anza-xyz/wallet-adapter) |
 | anchor-lang | armaniferrante | [Link](https://github.com/armaniferrante/anchor-lang) |
@@ -24,9 +25,11 @@ High-density index of active repositories on Solana. Discover and Contribute to 
 | perpetuals | askibin | [Link](https://github.com/askibin/perpetuals) |
 | anchor-idl-guard | blueshift-gg | [Link](https://github.com/blueshift-gg/anchor-idl-guard) |
 | quasar | blueshift-gg | [Link](https://github.com/blueshift-gg/quasar) |
+| soloha | callensm | [Link](https://github.com/callensm/soloha) |
 | solana-accountsdb-connector | ckamm | [Link](https://github.com/ckamm/solana-accountsdb-connector) |
 | apr-ui | coral-xyz | [Link](https://github.com/coral-xyz/apr-ui) |
 | backpack | coral-xyz | [Link](https://github.com/coral-xyz/backpack) |
+| solana | devonbeard | [Link](https://github.com/devonbeard/solana) |
 | gill | gillsdk | [Link](https://github.com/gillsdk/gill) |
 | geyser-kafka | ironforge-cloud | [Link](https://github.com/ironforge-cloud/geyser-kafka) |
 | geyser-store | ironforge-cloud | [Link](https://github.com/ironforge-cloud/geyser-store) |
@@ -59,6 +62,8 @@ High-density index of active repositories on Solana. Discover and Contribute to 
 | solana-wasm | jstarry | [Link](https://github.com/jstarry/solana-wasm) |
 | solana-workshop-tw | jstarry | [Link](https://github.com/jstarry/solana-workshop-tw) |
 | solana-governance-think-tank | laine-sa | [Link](https://github.com/laine-sa/solana-governance-think-tank) |
+| litesvm | litesvm | [Link](https://github.com/litesvm/litesvm) |
+| python-redis-mongodb | mertaydogan | [Link](https://github.com/mertaydogan/python-redis-mongodb) |
 | digital-asset-rpc-infrastructure | metaplex-foundation | [Link](https://github.com/metaplex-foundation/digital-asset-rpc-infrastructure) |
 | metaplex | metaplex-foundation | [Link](https://github.com/metaplex-foundation/metaplex) |
 | metaplex-program-library | metaplex-foundation | [Link](https://github.com/metaplex-foundation/metaplex-program-library) |
@@ -74,6 +79,7 @@ High-density index of active repositories on Solana. Discover and Contribute to 
 | x402-solana | ngundotra | [Link](https://github.com/ngundotra/x402-solana) |
 | solana-data-program | nvsriram | [Link](https://github.com/nvsriram/solana-data-program) |
 | serum-dex | project-serum | [Link](https://github.com/project-serum/serum-dex) |
+| metaboss | samuelvanderwaal | [Link](https://github.com/samuelvanderwaal/metaboss) |
 | wiki | solana-community | [Link](https://github.com/solana-community/wiki) |
 | one-milion-nfts | solana-developers | [Link](https://github.com/solana-developers/one-milion-nfts) |
 | pirate-bootcamp | solana-developers | [Link](https://github.com/solana-developers/pirate-bootcamp) |
@@ -95,7 +101,7 @@ High-density index of active repositories on Solana. Discover and Contribute to 
 | star_frame | staratlasmeta | [Link](https://github.com/staratlasmeta/star_frame) |
 | solana-workbench | workbenchapp | [Link](https://github.com/workbenchapp/solana-workbench) |
 
-## 🛠 Setup Instructions
+## Setup Instructions
 
 1. **Clone & Install**:
 
@@ -126,15 +132,15 @@ High-density index of active repositories on Solana. Discover and Contribute to 
    pnpm run dev
    ```
 
-## 🤝 Contribution Guidelines
+## Contribution Guidelines
 
 Want to add a repository or improve the codebase?
 Check out our [Contribution Guidelines](./CONTRIBUTING.md) (coming soon) or simply use the **"Add Repository"** button in the dashboard.
 
-### 📂 Repository Contributors
+### Repository Contributors
 
 People who have discovered and submitted high-quality repositories to our index.
 
-_No repository contributors yet. Submit a repo to be the first!_
+- **[Fahad-dezloper](https://github.com/fahad-dezloper/)**
 
 ---
