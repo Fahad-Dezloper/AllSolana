@@ -5,9 +5,12 @@ export async function POST(request: Request) {
   try {
     const { fullName, ownerLogin, summary, submittedBy } = await request.json();
 
-    if (!fullName || !ownerLogin || !submittedBy) {
+    if (!fullName) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
+
+    // Extract owner from fullName if not provided
+    const derivedOwner = ownerLogin || fullName.split("/")[0];
 
     const project = await prisma.project.upsert({
       where: { fullName },
@@ -17,9 +20,9 @@ export async function POST(request: Request) {
       },
       create: {
         fullName,
-        ownerLogin,
+        ownerLogin: derivedOwner,
         summary: summary || "",
-        submittedBy,
+        submittedBy: submittedBy || null,
         isPending: true,
         category: "Other",
         isSolanaRelated: true,
