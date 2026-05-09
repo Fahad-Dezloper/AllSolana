@@ -162,3 +162,51 @@ export async function batchAnalyzeWithAI(
 
   return results;
 }
+export async function classifyRepository(
+  fullName: string,
+  providedSummary?: string
+): Promise<AIAnalysis> {
+  // 1. Fetch live data for context if possible
+  let repo: GitHubRepo;
+  try {
+    const res = await fetch(`https://api.github.com/repos/${fullName}`, {
+      headers: process.env.GITHUB_TOKEN ? { Authorization: `token ${process.env.GITHUB_TOKEN}` } : {},
+    });
+    const data = await res.json();
+    
+    // Minimal mapping to GitHubRepo type
+    repo = {
+      name: data.name,
+      fullName: data.full_name,
+      description: providedSummary || data.description,
+      url: data.html_url,
+      homepage: data.homepage,
+      stars: data.stargazers_count,
+      forks: data.forks_count,
+      openIssues: data.open_issues_count,
+      pullRequests: 0,
+      languages: [], // We don't need this for classification if we have description/topics
+      topics: data.topics || [],
+      isArchived: data.archived,
+      isFork: data.fork,
+      updatedAt: data.updated_at,
+      pushedAt: data.pushed_at,
+      owner: {
+        login: data.owner.login,
+        avatarUrl: data.owner.avatar_url,
+      },
+      defaultBranch: data.default_branch,
+      parentName: null,
+    };
+  } catch (e) {
+    console.warn(`[AI] Could not fetch live data for ${fullName}, using provided context.`);
+    repo = {
+      fullName,
+      description: providedSummary || "No description provided",
+      topics: [],
+      // ... minimal mock
+    } as any;
+  }
+
+  return analyzeWithAI(repo, ["Manual Submission"]);
+}
