@@ -123,8 +123,7 @@ export async function analyzeWithAI(
       errMsg.includes("rate") ||
       (error as { statusCode?: number }).statusCode === 429
     ) {
-      console.warn(`[AI] ⚠ Rate limited on ${repo.fullName}. Disabling AI for remaining repos.`);
-      aiDisabled = true;
+      console.warn(`[AI] ⚠ Rate limited on ${repo.fullName}. Falling back to heuristics.`);
       return buildFallbackAnalysis(repo, heuristicSignals);
     }
 
