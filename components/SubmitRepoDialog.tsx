@@ -132,7 +132,11 @@ export function SubmitRepoDialog({
 
     const parts = repoUrl.split("github.com/")[1]?.split("/");
     if (!parts || parts.length < 2) return;
-    const fullName = `${parts[0]}/${parts[1]}`.toLowerCase();
+
+    // Clean up the repo name: remove .git suffix and any trailing slashes
+    const owner = parts[0];
+    const repo = parts[1].replace(/\.git$/, "").replace(/\/$/, "");
+    const fullName = `${owner}/${repo}`.toLowerCase();
 
     setIsVerifying(true);
 
@@ -235,8 +239,10 @@ export function SubmitRepoDialog({
     setIsSubmitting(true);
     try {
       const parts = repoUrl.split("github.com/")[1]?.split("/");
-      const fullName = `${parts[0]}/${parts[1]}`.toLowerCase();
-      
+      const owner = parts[0];
+      const repo = parts[1].replace(/\.git$/, "").replace(/\/$/, "");
+      const fullName = `${owner}/${repo}`.toLowerCase();
+
       // Use actual repo data description instead of the step description placeholder
       const summary = repoData?.description || "";
 
