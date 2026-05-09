@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { revalidateTag, revalidatePath } from "next/cache";
+import { revalidatePath } from "next/cache";
+import { classifyRepository } from "@/lib/ai-analyst";
 
 export async function POST(request: Request) {
   try {
@@ -13,12 +14,16 @@ export async function POST(request: Request) {
     // Extract owner from fullName if not provided
     const derivedOwner = ownerLogin || fullName.split("/")[0];
 
+    // Use Gemini to intelligently categorize the repository
+    const analysis = await classifyRepository(fullName, summary);
+
     const project = await prisma.project.upsert({
       where: { fullName },
       update: {
         submittedBy: submittedBy || null,
         isPending: false, 
         isSolanaRelated: true,
+        category: analysis.category,
       },
       create: {
         fullName,
@@ -26,7 +31,7 @@ export async function POST(request: Request) {
         summary: summary || "",
         submittedBy: submittedBy || null,
         isPending: false, 
-        category: "Other",
+        category: analysis.category,
         isSolanaRelated: true,
         analysisSource: "manual",
       },

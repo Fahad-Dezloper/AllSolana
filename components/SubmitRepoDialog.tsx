@@ -236,13 +236,16 @@ export function SubmitRepoDialog({
     try {
       const parts = repoUrl.split("github.com/")[1]?.split("/");
       const fullName = `${parts[0]}/${parts[1]}`.toLowerCase();
-      const summary = steps.find((s) => s.id === "fetch")?.description || "";
+      
+      // Use actual repo data description instead of the step description placeholder
+      const summary = repoData?.description || "";
 
       const res = await fetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           fullName,
+          ownerLogin: repoData?.owner?.login || parts[0],
           summary,
           submittedBy: usernameOverride || contributorUsername || null,
         }),
