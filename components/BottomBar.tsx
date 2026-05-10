@@ -39,7 +39,7 @@ function Dropdown({ label, options, selected, onToggle }: DropdownProps) {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-widest text-neutral-400 transition-all hover:bg-neutral-800 hover:text-white"
+        className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-widest text-neutral-400 transition-all hover:bg-neutral-800 hover:text-white"
       >
         <span className="text-neutral-500 hidden sm:inline">{label}:</span>
         <span className="text-neutral-500 sm:hidden">{label.slice(0, 1)}:</span>
@@ -57,7 +57,7 @@ function Dropdown({ label, options, selected, onToggle }: DropdownProps) {
       </button>
 
       {isOpen && (
-        <div className="absolute bottom-full left-0 mb-3 w-64 rounded-2xl border border-neutral-700 bg-[#161616] shadow-[0_20px_50px_rgba(0,0,0,1)] z-50 overflow-hidden">
+        <div className="absolute bottom-full left-0 mb-3 w-64 rounded-md border border-neutral-700 bg-[#161616] shadow-[0_20px_50px_rgba(0,0,0,1)] z-50 overflow-hidden">
           <div className="max-h-64 overflow-y-auto py-2 px-2">
             <button
               onClick={() => {
@@ -188,7 +188,7 @@ function SortDropdown({
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-widest text-neutral-400 transition-all hover:bg-neutral-800 hover:text-white"
+        className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-widest text-neutral-400 transition-all hover:bg-neutral-800 hover:text-white"
       >
         <span className="text-neutral-500 hidden sm:inline">SORT:</span>
         <span className="text-neutral-500 sm:hidden">S:</span>
@@ -250,7 +250,7 @@ export function BottomBar({
 
   return (
     <section className="fixed bottom-6 left-0 right-0 z-40 px-2 sm:px-4 flex justify-center">
-      <div className="flex items-center gap-1 sm:gap-2 rounded-full border border-neutral-700/50 bg-neutral-900/90 px-1.5 sm:px-3 py-1.5 sm:py-2 shadow-2xl shadow-black/50 backdrop-blur-xl max-w-full">
+      <div className="flex items-center gap-1 sm:gap-2 rounded-sm  border-2 border-neutral-600 bg-black px-1.5 sm:px-3 py-1.5 sm:py-2 shadow-2xl shadow-black/50 backdrop-blur-xl max-w-full">
         <div className="relative flex items-center">
           <Search size={14} className="absolute left-3 text-neutral-500" />
           <input
@@ -285,10 +285,9 @@ export function BottomBar({
         <div className="h-6 w-px bg-neutral-700/50" />
 
         <div className="flex items-center gap-1">
-
           <button
             onClick={() => setIsSubmitDialogOpen(true)}
-            className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-widest text-neutral-400 transition-all hover:bg-neutral-800 hover:text-white"
+            className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-widest text-neutral-400 transition-all hover:bg-neutral-800 hover:text-white"
           >
             <Plus size={14} />
             <span>Add</span>
@@ -299,7 +298,7 @@ export function BottomBar({
               <div className="h-6 w-px bg-neutral-700/50" />
               <button
                 onClick={clearFilters}
-                className="flex items-center justify-center rounded-full p-1.5 text-neutral-500 transition-all hover:bg-neutral-800 hover:text-white"
+                className="flex items-center justify-center rounded-md p-1.5 text-neutral-500 transition-all hover:bg-neutral-800 hover:text-white"
                 title="Clear Filters"
               >
                 <X size={14} />

@@ -289,7 +289,7 @@ export function SubmitRepoDialog({
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-[#0A0A0A] border border-neutral-800 p-6 z-[101] rounded-[32px] shadow-[0_32px_64px_rgba(0,0,0,0.5)]"
+            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-[#0A0A0A] border border-neutral-800 p-6 z-[101] rounded-md shadow-[0_32px_64px_rgba(0,0,0,0.5)]"
           >
             <div className="flex justify-between items-start mb-6">
               <div>
@@ -302,7 +302,7 @@ export function SubmitRepoDialog({
               </div>
               <button
                 onClick={handleClose}
-                className="p-2 hover:bg-neutral-800 rounded-full transition-colors"
+                className="p-2 hover:bg-neutral-800 rounded-md transition-colors"
               >
                 <X size={20} className="text-neutral-400" />
               </button>
@@ -324,7 +324,7 @@ export function SubmitRepoDialog({
                       placeholder="https://github.com/org/repo"
                       value={repoUrl}
                       onChange={(e) => setRepoUrl(e.target.value)}
-                      className="w-full bg-neutral-900 border border-neutral-800 rounded-2xl py-4 pl-12 pr-4 text-sm font-medium text-white placeholder:text-neutral-700 focus:outline-none focus:border-white/20 transition-all"
+                      className="w-full bg-neutral-900 border border-neutral-800 rounded-md py-4 pl-12 pr-4 text-sm font-medium text-white placeholder:text-neutral-700 focus:outline-none focus:border-white/20 transition-all"
                     />
                   </div>
                 </div>
@@ -332,7 +332,7 @@ export function SubmitRepoDialog({
                 <button
                   onClick={startVerification}
                   disabled={!repoUrl.includes("github.com/")}
-                  className="w-full bg-white text-black py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-neutral-200 transition-all disabled:opacity-50 disabled:hover:bg-white flex items-center justify-center gap-2"
+                  className="w-full bg-white text-black py-4 rounded-md font-black text-xs uppercase tracking-widest hover:bg-neutral-200 transition-all disabled:opacity-50 disabled:hover:bg-white flex items-center justify-center gap-2"
                 >
                   Start Verification <ArrowRight size={14} />
                 </button>
@@ -340,7 +340,7 @@ export function SubmitRepoDialog({
             ) : (
               <div className="space-y-4">
                 {/* Status/Focus Card */}
-                <div className="bg-neutral-900/50 border border-neutral-800 p-6 rounded-[24px] shadow-2xl relative overflow-hidden group min-h-[160px] flex flex-col justify-center">
+                <div className="bg-neutral-900/50 border border-neutral-800 p-6 rounded-md shadow-2xl relative overflow-hidden group min-h-[160px] flex flex-col justify-center">
                   {isVerified ? (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
@@ -410,7 +410,7 @@ export function SubmitRepoDialog({
                         {steps.map((_, i) => (
                           <div
                             key={i}
-                            className={`h-1 rounded-full transition-all duration-500 ${
+                            className={`h-1 rounded-md transition-all duration-500 ${
                               i === currentStep
                                 ? "w-8 bg-white"
                                 : i < currentStep
@@ -448,7 +448,7 @@ export function SubmitRepoDialog({
                           onChange={(e) =>
                             setContributorUsername(e.target.value)
                           }
-                          className="w-full bg-neutral-900 border border-neutral-800 rounded-2xl py-3.5 pl-11 pr-4 text-xs font-bold text-white placeholder:text-neutral-700 focus:outline-none focus:border-white/20 transition-all uppercase tracking-widest"
+                          className="w-full bg-neutral-900 border border-neutral-800 rounded-md py-3.5 pl-11 pr-4 text-xs font-bold text-white placeholder:text-neutral-700 focus:outline-none focus:border-white/20 transition-all uppercase tracking-widest"
                         />
                       </div>
                     </div>
@@ -457,14 +457,14 @@ export function SubmitRepoDialog({
                       <div className="flex gap-2">
                         <button
                           onClick={handleClose}
-                          className="flex-1 px-6 py-4 bg-neutral-900 border border-neutral-800 text-neutral-400 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-neutral-800 transition-all"
+                          className="flex-1 px-6 py-4 bg-neutral-900 border border-neutral-800 text-neutral-400 rounded-md font-black text-xs uppercase tracking-widest hover:bg-neutral-800 transition-all"
                         >
                           Skip
                         </button>
                         <button
                           onClick={() => submitFinal()}
                           disabled={!contributorUsername || isSubmitting}
-                          className="flex-[2] px-6 py-4 bg-solana-green text-black rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-solana-green/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                          className="flex-[2] px-6 py-4 bg-solana-green text-black rounded-md font-black text-xs uppercase tracking-widest hover:bg-solana-green/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                           {isSubmitting ? (
                             <Loader2 size={14} className="animate-spin" />
@@ -481,7 +481,7 @@ export function SubmitRepoDialog({
                   <div className="pt-2">
                     <button
                       onClick={resetSteps}
-                      className="w-full bg-neutral-900 border border-neutral-800 text-neutral-400 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-neutral-800 transition-all"
+                      className="w-full bg-neutral-900 border border-neutral-800 text-neutral-400 py-4 rounded-md font-black text-[10px] uppercase tracking-widest hover:bg-neutral-800 transition-all"
                     >
                       Try Another Repository
                     </button>
