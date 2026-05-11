@@ -12,6 +12,9 @@ import {
   Code2,
   Globe,
   AlertCircle,
+  ExternalLink,
+  User,
+  Search,
 } from "lucide-react";
 
 const GithubIcon = ({
@@ -65,6 +68,9 @@ export function SubmitRepoDialog({
   const [errorReason, setErrorReason] = useState<string | null>(null);
   const [repoData, setRepoData] = useState<any>(null);
   const [contributorUsername, setContributorUsername] = useState("");
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
   const [isVerified, setIsVerified] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showContributorInput, setShowContributorInput] = useState(false);
@@ -114,6 +120,8 @@ export function SubmitRepoDialog({
     setErrorReason(null);
     setRepoData(null);
     setContributorUsername("");
+    setSuggestions([]);
+    setSelectedUser(null);
     setIsVerified(false);
     setIsSubmitting(false);
     setShowContributorInput(false);
@@ -126,6 +134,33 @@ export function SubmitRepoDialog({
       resetSteps();
     }, 300);
   };
+
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (contributorUsername.length < 2 || selectedUser) {
+        setSuggestions([]);
+        return;
+      }
+
+      setIsLoadingSuggestions(true);
+      try {
+        const res = await fetch(
+          `https://api.github.com/search/users?q=${contributorUsername}&per_page=5`,
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setSuggestions(data.items || []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch suggestions", err);
+      } finally {
+        setIsLoadingSuggestions(false);
+      }
+    };
+
+    const timeoutId = setTimeout(fetchSuggestions, 300);
+    return () => clearTimeout(timeoutId);
+  }, [contributorUsername, selectedUser]);
 
   const startVerification = async () => {
     if (!repoUrl.includes("github.com/")) return;
@@ -253,7 +288,11 @@ export function SubmitRepoDialog({
           fullName,
           ownerLogin: repoData?.owner?.login || parts[0],
           summary,
-          submittedBy: usernameOverride || contributorUsername || null,
+          submittedBy:
+            selectedUser?.login ||
+            usernameOverride ||
+            contributorUsername ||
+            null,
         }),
       });
 
@@ -437,19 +476,103 @@ export function SubmitRepoDialog({
                         <span className="opacity-50">(Optional)</span>
                       </label>
                       <div className="relative">
-                        <GithubIcon
-                          className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-600"
-                          size={16}
-                        />
-                        <input
-                          type="text"
-                          placeholder="GitHub Username"
-                          value={contributorUsername}
-                          onChange={(e) =>
-                            setContributorUsername(e.target.value)
-                          }
-                          className="w-full bg-neutral-900 border border-neutral-800 rounded-md py-3.5 pl-11 pr-4 text-xs font-bold text-white placeholder:text-neutral-700 focus:outline-none focus:border-white/20 transition-all uppercase tracking-widest"
-                        />
+                        {selectedUser ? (
+                          <div className="flex items-center justify-between w-full bg-neutral-900 border border-white/20 rounded-md py-2.5 pl-3 pr-4">
+                            <div className="flex items-center gap-3">
+                              <img
+                                src={selectedUser.avatar_url}
+                                alt={selectedUser.login}
+                                className="w-8 h-8 rounded-full border border-neutral-700"
+                              />
+                              <div className="flex flex-col">
+                                <span className="text-xs font-black text-white uppercase tracking-widest">
+                                  {selectedUser.login}
+                                </span>
+                                <a
+                                  href={selectedUser.html_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[9px] text-solana-green font-bold uppercase tracking-wider flex items-center gap-1 hover:underline"
+                                >
+                                  View Profile <ExternalLink size={8} />
+                                </a>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => {
+                                setSelectedUser(null);
+                                setContributorUsername("");
+                              }}
+                              className="p-1.5 hover:bg-neutral-800 rounded-md text-neutral-500 hover:text-white transition-colors"
+                            >
+                              <X size={14} />
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="relative">
+                              <GithubIcon
+                                className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-600"
+                                size={16}
+                              />
+                              <input
+                                type="text"
+                                placeholder="GitHub Username"
+                                value={contributorUsername}
+                                onChange={(e) =>
+                                  setContributorUsername(e.target.value)
+                                }
+                                className="w-full bg-neutral-900 border border-neutral-800 rounded-md py-3.5 pl-11 pr-4 text-xs font-bold text-white placeholder:text-neutral-700 focus:outline-none focus:border-white/20 transition-all uppercase tracking-widest"
+                              />
+                              {isLoadingSuggestions && (
+                                <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                                  <Loader2
+                                    size={14}
+                                    className="animate-spin text-neutral-600"
+                                  />
+                                </div>
+                              )}
+                            </div>
+
+                            <AnimatePresence>
+                              {suggestions.length > 0 && (
+                                <motion.div
+                                  initial={{ opacity: 0, y: -10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -10 }}
+                                  className="absolute left-0 right-0 top-full mt-2 bg-[#0A0A0A] border border-neutral-800 rounded-md overflow-hidden z-20 shadow-2xl"
+                                >
+                                  {suggestions.map((user) => (
+                                    <button
+                                      key={user.id}
+                                      onClick={() => {
+                                        setSelectedUser(user);
+                                        setContributorUsername(user.login);
+                                        setSuggestions([]);
+                                      }}
+                                      className="w-full flex items-center gap-3 p-3 hover:bg-neutral-900 transition-colors border-b border-neutral-800/50 last:border-0 group"
+                                    >
+                                      <img
+                                        src={user.avatar_url}
+                                        alt={user.login}
+                                        className="w-6 h-6 rounded-full border border-neutral-800"
+                                      />
+                                      <span className="text-[11px] font-bold text-neutral-400 group-hover:text-white transition-colors">
+                                        {user.login}
+                                      </span>
+                                      <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <Check
+                                          size={12}
+                                          className="text-solana-green"
+                                        />
+                                      </div>
+                                    </button>
+                                  ))}
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </>
+                        )}
                       </div>
                     </div>
 
@@ -463,7 +586,10 @@ export function SubmitRepoDialog({
                         </button>
                         <button
                           onClick={() => submitFinal()}
-                          disabled={!contributorUsername || isSubmitting}
+                          disabled={
+                            (!contributorUsername && !selectedUser) ||
+                            isSubmitting
+                          }
                           className="flex-[2] px-6 py-4 bg-solana-green text-black rounded-md font-black text-xs uppercase tracking-widest hover:bg-solana-green/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                           {isSubmitting ? (
